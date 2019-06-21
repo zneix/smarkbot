@@ -1,0 +1,13 @@
+{
+    "name": "levelsmark",
+    "version": "0.0.1",
+    "author": {
+        "name": "zneix#4433",
+        "url": "http://zneix.cba.pl"
+    },
+    "main": "index.js",
+    "dependencies": {
+        "discord.js": "^11.4.2",
+        "enmap": "^5.0.0"
+    }
+}
