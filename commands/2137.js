@@ -1,12 +1,19 @@
-exports.run = (bot, message, args) => {
-    let okrutnik = message.guild.roles.find(r => r.name === `okrutnik`);
-    if (!okrutnik) message.channel.send(`Role named \`okrutnik\` does not exist, contact admins or zneix!`);
-    if (!message.member.roles.has(okrutnik.id)) {
-        message.member.addRole(okrutnik);message.reply(`granted event role`);
-        console.log(`(2137) granted event role to `+message.author.tag);
-    }
-    else {
-        message.member.removeRole(okrutnik);message.reply(`revoked event role`);
-        console.log(`(2137) revoked event role from `+message.author.tag);
-    }
+exports.name = `{PREFIX}${__filename.split(/[\\/]/).pop().slice(0,-3)}`;
+exports.description = `Toggles 2137 event role on yourself.`;
+exports.usage = `{PREFIX}${__filename.split(/[\\/]/).pop().slice(0,-3)}`
+exports.perms = `user`
+
+exports.run = async (client, message) => {
+    message.command(false, async () => {
+        let role = message.guild.roles.get(client.config.roles.event);
+        if (!role) throw `Event role does not exist, contact admins or zneix!`
+        if (!message.member.roles.has(role.id)) {
+            await message.member.addRole(role);
+            require(`../src/embeds/roleGrant`)(client, message, role, message.author, __filename.split(/[\\/]/).pop().slice(0,-3));
+        }
+        else {
+            await message.member.removeRole(role);
+            require(`../src/embeds/roleRevoke`)(client, message, role, message.author, __filename.split(/[\\/]/).pop().slice(0,-3));
+        }
+    });
 }

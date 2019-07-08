@@ -1,28 +1,32 @@
+//npm libs
+const Discord = require('discord.js'); //discord core library
+const enmap = require('enmap'); //enmap object for command handler
 const fs = require('fs');
-const enmap = require('enmap');
-const discord = require('discord.js');
-const bot = new discord.Client();
-const config = require('./config.json');
-bot.config = config;
-bot.commands = new enmap();
-fs.readdir("./events", (err, files) => {
-    files.forEach(file => {
-        if (err) return console.error(err);
-        let event = require(`./events/${file}`);
-        let eventName = file.split(".")[0];
-        bot.on(eventName, event.bind(null, bot));
-        delete require.cache[require.resolve(`./events/${file}`)];
-    });
-});
-fs.readdir("./commands", (err, files) => {
-    files.forEach(file => {
-        if (err) return console.error(err);
-        if (!file.endsWith(".js")) return null;
-        let props = require(`./commands/${file}`);
-        let commandName = file.split(".")[0];
-        console.log(`Attempting to load command ${commandName}`);
-        bot.commands.set(commandName, props);
-    });
-    console.log(`\nCommands loaded, preparing to auth the WebSocket!\n=================================================`);
-});
-bot.login(process.env.token);
+const schedule = require('node-schedule'); //yet useless
+require('npm-package-to-env').config(); //importing version value from package.json
+require(`./extensions/errorHandler`); //handling thrown errors
+
+var Promise = require('bluebird'); //module for error handler and rejections while using fs.writeFile
+Promise.config({longStackTraces:true}); //enabling long stack trees
+
+//JSON data
+const config = require(`./src/json/config.json`);
+const perms = require(`./src/json/perms.json`);
+
+//Discord client extras
+const client = new Discord.Client();
+client.config = config;
+client.perms = perms;
+client.commands = new enmap();
+client.version = process.env.npm_package_version; //global version
+client.RC = require('reaction-core'); //module for ahndling reactions
+client.RCHandler = new client.RC.Handler;
+client.fs = fs;
+client.schedule = schedule; //yet useless
+
+//handlers
+require(`./src/functions/loadEvents`)(client); //event handler
+require(`./src/functions/loadCommands`)(client); //command handler
+
+//Discord authentication
+client.login(process.env.token);

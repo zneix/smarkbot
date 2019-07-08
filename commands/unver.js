@@ -1,33 +1,34 @@
-exports.run = (bot, message, args) => {
-    if (!message.guild.member(message.author).hasPermission('MANAGE_ROLES')) return message.reply(`permissions missing!`);
-    if (!args[0]) return message.reply(`gib user ID or tag!\nyou can also use \`latest\` or \`all\` here`);
-    const taggedUser = message.mentions.users.first();
-    const role = message.guild.roles.get(bot.config.memberRole);
-    if (!role) return message.channel.send(`The role with an ID ${bot.config.member} does not exists!\nContact mods or zneix!`);
-    if (!taggedUser) {
-        let validUID = bot.users.get(args[0]);
-        if (!validUID) {
-            if (args[0] === `latest`) {
-                if (!bot.config.latestMember) return message.channel.send(`I'm sorry, but property of latest user does not exist!\nYou'll have to use an ID or tag a user`);
-                try {
-                message.guild.member(latestMember).removeRole(role)
-                .then(() => message.channel.send(latestMember.user.tag+` got rejected a member role successfully!`));
-                console.log(`(unver-latest) '${message.author.tag}' unverified '${latestMember.user.tag}'`);
-                } catch {e => console.log(e);};
-                return null;
+exports.name = `{PREFIX}${__filename.split(/[\\/]/).pop().slice(0,-3)}`;
+exports.description = `Unverifies provided user.`;
+exports.usage = `{PREFIX}${__filename.split(/[\\/]/).pop().slice(0,-3)} [user_ID | @mention | latest]`
+exports.perms = `mod`
+
+exports.run = async (client, message) => {
+    message.command(1, async () => {
+        //code...
+        if (!message.guild.member(message.author).hasPermission('MANAGE_ROLES')) throw `You're missing permissions!`
+        const taggedUser = message.mentions.users.first();
+        const role = message.guild.roles.get(client.config.roles.member);
+        if (!role) return require(`../src/embeds/verificationProblem`)(client, message, `⚠ Role missing! ⚠`, `The role with an ID ${client.config.roles.member} does not exists!\n**Contact admins or zneix immediately!\nTHIS CODE SHOULD NEVER EXECUTE !!!!!!1!!11!111!!!!!!11!!**`);
+        if (!taggedUser) {
+            let validUID = message.guild.members.get(message.args[0]);
+            if (!validUID) {
+                if (message.args[0] === `latest`) {
+                    if (!client.config.latestMember) return require(`../src/embeds/verificationProblem`)(client, message, `Property does not exist!`, `Use an user ID or @mention.`);
+                    try {
+                    message.guild.member(latestMember).removeRole(role).then(() => {return require(`../src/embeds/unverified`)(client, message, message.author, latestMember.user)});
+                    } catch {e => console.log(e);};
+                    return;
+                }
+                throw `Provided ID \`${message.args[0]}\` is invalid!`
             }
-            return message.reply(`the ID you provided is invalid PepeLaugh`);
+            try {message.guild.member(validUID).removeRole(role).then(() => {return require(`../src/embeds/unverified`)(client, message, message.author, validUID)});
+            } catch {e => console.log(e);}
         }
-        try {message.guild.member(validUID).removeRole(role)
-            .then(() => message.channel.send(validUID.tag+` got rejected a member role successfully!`));
-            console.log(`(unver) '${message.author.tag}' unverified '${validUID.tag}'`);
-        } catch {e => console.log(e);}
-    }
-    else {
-        try {
-            message.guild.member(taggedUser).removeRole(role)
-            .then(() => message.channel.send(taggedUser.tag+` got rejected a member role successfully!`));
-            console.log(`(unver) '${message.author.tag}' unverified '${taggedUser.tag}'`);
-        } catch {e => console.log(e);}
-    }
+        else {
+            try {
+                message.guild.member(taggedUser).removeRole(role).then(() => {return require(`../src/embeds/unverified`)(client, message, message.author, taggedUser)});
+            } catch {e => console.log(e);}
+        }
+    });
 }
