@@ -1,5 +1,11 @@
+#global node_modules ignorance
 node_modules/*
 node_modules/
 node_modules
+
+#command template and testing commands
 commands/template
+commands/
+
+#ignoring auth file with credentials TriHard
 src/json/auth.js
