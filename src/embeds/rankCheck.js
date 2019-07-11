@@ -24,7 +24,9 @@ module.exports = (message, xp, lvl) => {
             text: message.author.tag,
             icon_url: message.author.avatarURL
         },
-        description: "Level progress",
+        author: {
+            name: "Level progress"
+        },
         fields: [
             {
                 name: "Level",
