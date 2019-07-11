@@ -50,7 +50,7 @@ module.exports = async (client, message) => {
 
             //cooldown thingy
             client.tr.add(message.author.id);
-            client.at('in 60 seconds', function() {client.tr.delete(message.author.id)});
+            setTimeout(function() {client.tr.delete(message.author.id)}, 60000);
 
             const conn = await client.mysql.createConnection(client.auth.db);
             var [rows, fields] = await conn.execute(`SELECT * FROM \`smarkbot_levels\` WHERE uid = ${message.author.id}`);

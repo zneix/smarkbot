@@ -9,7 +9,7 @@ exports.run = async (client, message) => {
 
         //cooldown thingy
         client.lvlcd.add(message.author.id);
-        client.at('in 60 seconds', function(){client.lvlcd.delete(message.author.id)});
+        setTimeout(function(){client.lvlcd.delete(message.author.id)}, 100);
 
         //actual response
         const conn = await client.mysql.createConnection(client.auth.db);
