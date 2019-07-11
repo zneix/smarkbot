@@ -1,4 +1,4 @@
-module.exports = (client, message) => {
+module.exports = async (client, message) => {
     if (message.author.bot || message.channel.type === "dm") return;
     try {
         let prefix = function(){return message.content.substr(0, client.config.prefix.length).toLowerCase();}
@@ -41,9 +41,45 @@ module.exports = (client, message) => {
         }
         else {
             //message handling
-            return;
+            //levling system in action below
+
+            //escaping blacklisted channels, banned users and users on cooldown
+            if (message.guild.id !== client.config.guildID) return; //guild
+            if (client.config.blacklist.includes(message.channel.id) || client.config.blocked.includes(message.author.id)) return; //bl channels, bl users
+            if (client.tr.has(message.author.id)) return; //cooldowned users
+
+            //cooldown thingy
+            client.tr.add(message.author.id);
+            client.at('in 60 seconds', function() {client.tr.delete(message.author.id)});
+
+            const conn = await client.mysql.createConnection(client.auth.db);
+            var [rows, fields] = await conn.execute(`SELECT * FROM \`smarkbot_levels\` WHERE uid = ${message.author.id}`);
+            if (!rows.length) return await conn.execute(`INSERT INTO \`smarkbot_levels\` (pk, uid, xp, lvl) VALUES (NULL, ${message.author.id}, 0, 0)`);
+            function randomXP(){return Math.floor(15 + Math.random()*11);}
+            let random = randomXP();
+            let sum = 0;
+            let i = 0;
+            do {
+                sum = sum + (5 * Math.pow(i, 2) + 50 * i + 100);
+                i++;
+            } while (i < rows[0]["lvl"]+1);
+            if ((rows[0]["xp"]+random) > sum) {
+                //level up
+                if (client.config.rewards[rows[0]["lvl"]+1]) {
+                    //level up with role reward
+                    let rewardRole = message.guild.roles.get(client.config.rewards[`${rows[0]["lvl"]+1}`]);
+                    if (rewardRole) message.member.addRole(rewardRole);
+                    let deletRole = message.guild.roles.get(client.config.rewards[`${rows[0]["lvl"]+1-4}`]);
+                    if (deletRole) message.member.removeRole(deletRole);
+                }
+                //regular level up
+                await conn.execute(`UPDATE \`smarkbot_levels\` SET xp = ${rows[0]["xp"]+random}, lvl = ${rows[0]["lvl"]+1} WHERE uid = ${message.author.id}`);
+                //annoucment and log
+                require(`../src/embeds/levelUp`)(message, rows[0]["lvl"]+1);
+            }
+            //regular xp add
+            else await conn.execute(`UPDATE \`smarkbot_levels\` SET xp = ${rows[0]["xp"]+random} WHERE uid =${message.author.id}`);
         }
-            
     }
     catch (err) {
         if (typeof err !== "string") err.stack = err;
