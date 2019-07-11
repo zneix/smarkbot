@@ -44,4 +44,4 @@ require(`./src/functions/loadCommands`)(client); //command handler
 // client.query = async function query() {return await mysql.createConnection(auth.db);}
 
 //Discord authentication
-client.login(process.env.token); //with Discord bot token
+client.login(auth.token); //with Discord bot token
