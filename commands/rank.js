@@ -16,10 +16,10 @@ exports.run = async (client, message) => {
         var [rows, fields] = await conn.query(`SELECT * FROM \`smarkbot_levels\` WHERE uid = ${message.author.id}`);
         if (!rows.length) {
             await conn.query(`INSERT INTO \`smarkbot_levels\` (pk, uid, xp, lvl) VALUES (NULL, ${message.author.id}, 0, 0)`),
-            require(`../src/embeds/rankCheck`)(message, rows[0]["xp"], rows[0]["lvl"])
+            await require(`../src/embeds/rankCheck`)(message, rows[0]["xp"], rows[0]["lvl"])
             return conn.destroy();
         }
-        require(`../src/embeds/rankCheck`)(message, rows[0]["xp"], rows[0]["lvl"])
+        await require(`../src/embeds/rankCheck`)(message, rows[0]["xp"], rows[0]["lvl"])
         return await conn.destroy();
     });
 }
