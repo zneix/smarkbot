@@ -51,9 +51,9 @@ module.exports = async (client, message) => {
             client.tr.add(message.author.id);
             setTimeout(function() {client.tr.delete(message.author.id)}, 60000);
 
-            const conn = await client.mysql.createConnection(client.auth.db);
-            var [rows, fields] = await conn.execute(`SELECT * FROM \`smarkbot_levels\` WHERE uid = ${message.author.id}`);
             if (!rows.length) return await conn.execute(`INSERT INTO \`smarkbot_levels\` (pk, uid, xp, lvl) VALUES (NULL, ${message.author.id}, 0, 0)`);
+            var conn = await mysql.createConnection(client.auth.db);
+            var [rows, fields] = await conn.query(`SELECT * FROM \`smarkbot_levels\` WHERE uid = ${message.author.id}`);
             let random = Math.floor(15 + Math.random()*11);
             let sum = 0;
             let i = 0;
@@ -71,12 +71,11 @@ module.exports = async (client, message) => {
                     if (deletRole) message.member.removeRole(deletRole);
                 }
                 //regular level up
-                await conn.execute(`UPDATE \`smarkbot_levels\` SET xp = ${rows[0]["xp"]+random}, lvl = ${rows[0]["lvl"]+1} WHERE uid = ${message.author.id}`);
-                //annoucment and log
-                require(`../src/embeds/levelUp`)(message, rows[0]["lvl"]+1);
+                await conn.query(`UPDATE \`smarkbot_levels\` SET xp = ${rows[0]["xp"]+random}, lvl = ${rows[0]["lvl"]+1} WHERE uid = ${message.author.id}`);
+                require(`../src/embeds/levelUp`)(message, rows[0]["lvl"]+1); //annoucment and log
             }
             //regular xp add
-            else await conn.execute(`UPDATE \`smarkbot_levels\` SET xp = ${rows[0]["xp"]+random} WHERE uid =${message.author.id}`);
+            else await conn.query(`UPDATE \`smarkbot_levels\` SET xp = ${rows[0]["xp"]+random} WHERE uid =${message.author.id}`);
         }
     }
     catch (err) {
