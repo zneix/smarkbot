@@ -10,3 +10,4 @@ commands/template
 /src/json/auth.*
 src/json/auth.js
 src/json/auth.*
+src/json/auth.js
