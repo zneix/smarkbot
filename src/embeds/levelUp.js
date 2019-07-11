@@ -13,8 +13,6 @@ module.exports = (message, lvl) => {
             }
         ]
     }
-    return [
-        message.channel.send({embed:embed}),
-        console.log(`{level-up} '${message.author.tag}' achieved level ${lvl}!`)
-    ]
+    message.channel.send({embed:embed}),
+    console.log(`{level-up} '${message.author.tag}' achieved level ${lvl}!`)
 }

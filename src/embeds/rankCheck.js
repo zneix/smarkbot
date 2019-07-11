@@ -41,5 +41,5 @@ module.exports = (message, xp, lvl) => {
         ]
     }
     if (lvl = 0) embed.fields[1].value = xp+"/"+(reqXP()-actualXP())+` (total: ${xp})`
-    return message.channel.send({embed:embed});
+    message.channel.send({embed:embed});
 }
