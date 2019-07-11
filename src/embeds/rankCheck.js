@@ -1,4 +1,4 @@
-module.exports = (client, message, xp, lvl) => {
+module.exports = (message, xp, lvl) => {
     function reqXP(){
         let sum = 0;
         let i = 0;
