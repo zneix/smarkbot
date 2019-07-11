@@ -8,3 +8,4 @@ commands/template
 
 #ignoring auth file with credentials TriHard
 src/json/auth.js
+sqlDebug.js
