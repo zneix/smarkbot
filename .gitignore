@@ -6,4 +6,4 @@ node_modules
 #command template
 commands/template
 #ignoring auth file with credentials TriHard
-# src/json/auth.js
+src/json/auth.js
