@@ -40,10 +40,9 @@ module.exports = async (client, message) => {
             cmd.run(client, message);
         }
         else {
-            //message handling
-            //levling system in action below
+            //message handling - levling system in action below
 
-            //escaping blacklisted channels, banned users and users on cooldown
+            //escaping various conditions...
             if (message.guild.id !== client.config.guildID) return; //guild
             if (client.config.blacklist.includes(message.channel.id) || client.config.blocked.includes(message.author.id)) return; //bl channels, bl users
             if (client.tr.has(message.author.id)) return; //cooldowned users

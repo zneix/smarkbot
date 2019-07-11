@@ -15,7 +15,6 @@ const config = require('./src/json/config.json');
 const perms = require('./src/json/perms.json');
 const auth = require('./src/json/auth')(Promise);
 
-
 //global Discord client extras
 const client = new Discord.Client(); //declaring new Discord client user as a global variable
 client.config = config; //global config
@@ -30,16 +29,10 @@ client.schedule = schedule; //yet useless
 client.mysql = mysql; //global mysql lib object (just in case)
 client.tr = new Set(); //set for talkedRecently (used by lidl leveling system)
 client.lvlcd = new Set(); //set for cooldowning level check command
-// client.dbConn = require(`./src/functions/mysqlConnect`)(mysql, auth); //global database connection
-
-//mysql database connaction establish thingy
-// let conn = client.mysql.createConnection(client.auth.db);
-// client.conn = conn;
 
 //handlers and global function exports
 require(`./src/functions/loadEvents`)(client); //event handler
 require(`./src/functions/loadCommands`)(client); //command handler
-// client.query = async function query() {return await mysql.createConnection(auth.db);}
 
 //Discord authentication
 client.login(auth.token); //with Discord bot token
