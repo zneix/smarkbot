@@ -1,15 +1,15 @@
 exports.name = `{PREFIX}${__filename.split(/[\\/]/).pop().slice(0,-3)}`;
-exports.description = `Allows you to check your level progress (has 60s cooldown).`;
+exports.description = `Allows you to check your level progress (has 30s cooldown).`;
 exports.usage = `{PREFIX}${__filename.split(/[\\/]/).pop().slice(0,-3)}`
 exports.perms = `user`
 
 exports.run = async (client, message) => {
     message.command(false, async () => {
-        if (client.lvlcd.has(message.author.id)) throw "You can use that command once per **60 seconds**!\nTry again later."
+        if (client.lvlcd.has(message.author.id)) throw "You can use that command once per **30 seconds**!\nTry again later."
 
         //cooldown thingy
         client.lvlcd.add(message.author.id);
-        setTimeout(function(){client.lvlcd.delete(message.author.id)}, 100);
+        setTimeout(function(){client.lvlcd.delete(message.author.id)}, 30000);
 
         //actual response
         var conn = await client.mysql.createConnection(client.auth.db);
