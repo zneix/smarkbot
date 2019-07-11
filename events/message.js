@@ -54,8 +54,7 @@ module.exports = async (client, message) => {
             const conn = await client.mysql.createConnection(client.auth.db);
             var [rows, fields] = await conn.execute(`SELECT * FROM \`smarkbot_levels\` WHERE uid = ${message.author.id}`);
             if (!rows.length) return await conn.execute(`INSERT INTO \`smarkbot_levels\` (pk, uid, xp, lvl) VALUES (NULL, ${message.author.id}, 0, 0)`);
-            function randomXP(){return Math.floor(15 + Math.random()*11);}
-            let random = randomXP();
+            let random = Math.floor(15 + Math.random()*11);
             let sum = 0;
             let i = 0;
             do {
