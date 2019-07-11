@@ -12,12 +12,14 @@ exports.run = async (client, message) => {
         setTimeout(function(){client.lvlcd.delete(message.author.id)}, 100);
 
         //actual response
-        if (!rows.length) return [
-            await conn.execute(`INSERT INTO \`smarkbot_levels\` (pk, uid, xp, lvl) VALUES (NULL, ${message.author.id}, 0, 0)`),
         var conn = await client.mysql.createConnection(client.auth.db);
         var [rows, fields] = await conn.query(`SELECT * FROM \`smarkbot_levels\` WHERE uid = ${message.author.id}`);
+        if (!rows.length) {
+            await conn.query(`INSERT INTO \`smarkbot_levels\` (pk, uid, xp, lvl) VALUES (NULL, ${message.author.id}, 0, 0)`),
             require(`../src/embeds/rankCheck`)(message, rows[0]["xp"], rows[0]["lvl"])
-        ]
+            return conn.destroy();
+        }
         require(`../src/embeds/rankCheck`)(message, rows[0]["xp"], rows[0]["lvl"])
+        return await conn.destroy();
     });
 }
