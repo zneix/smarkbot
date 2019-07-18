@@ -9,6 +9,7 @@ module.exports = (client, message, channel) => {
         if (n<=86400000) return `${Math.floor(n/3600000)}h ${Math.floor(n/60000)-(Math.floor(n/3600000)*60)}m`;
         return `${Math.floor(n/86400000)}d ${Math.floor(n/3600000)-(Math.floor(n/86400000)*24)}h`;
     }
+    let user = message.author;
     let date = user.createdAt;
     let formattedDate = leadingZeroes(date.getDate())+"/"+leadingZeroes(date.getMonth()+1)+"/"+date.getFullYear()+", "+leadingZeroes(date.getHours())+":"+leadingZeroes(date.getMinutes())+":"+leadingZeroes(date.getSeconds());
     var embed = {
@@ -23,11 +24,11 @@ module.exports = (client, message, channel) => {
             name: `Message Deleted`,
             icon_url: user.avatarURL
         },
-        description: `${message.author} in ${message.channel}`,
+        description: `${message.author?message.author:'unknown#0000'} in ${message.channel}`,
         fields: [
             {
                 name: "Deleted Message",
-                value: message.content
+                value: message.content?message.content:'null'
             }
         ]
     }
