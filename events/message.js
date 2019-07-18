@@ -43,8 +43,9 @@ module.exports = async (client, message) => {
             //message handling - levling system in action below
 
             //escaping various conditions...
+            if (client.config.modules.leveling.enabled === false) return;
             if (message.guild.id !== client.config.guildID) return; //guild
-            if (client.config.blacklist.includes(message.channel.id) || client.config.blocked.includes(message.author.id)) return; //bl channels, bl users
+            if (client.config.modules.leveling.blacklist.includes(message.channel.id) || client.config.modules.leveling.blocked.includes(message.author.id)) return; //bl channels, bl users
             if (client.tr.has(message.author.id)) return; //cooldowned users
 
             //cooldown thingy
@@ -66,11 +67,11 @@ module.exports = async (client, message) => {
             } while (i < rows[0]["lvl"]+1);
             if ((rows[0]["xp"]+random) > sum) {
                 //level up
-                if (client.config.rewards[rows[0]["lvl"]+1]) {
+                if (client.config.modules.leveling.rewards[rows[0]["lvl"]+1]) {
                     //level up with role reward
-                    let rewardRole = message.guild.roles.get(client.config.rewards[`${rows[0]["lvl"]+1}`]);
+                    let rewardRole = message.guild.roles.get(client.config.modules.leveling.rewards[`${rows[0]["lvl"]+1}`]);
                     if (rewardRole) message.member.addRole(rewardRole);
-                    let deletRole = message.guild.roles.get(client.config.rewards[`${rows[0]["lvl"]+1-4}`]);
+                    let deletRole = message.guild.roles.get(client.config.modules.leveling.rewards[`${rows[0]["lvl"]+1-4}`]);
                     if (deletRole) message.member.removeRole(deletRole);
                 }
                 //regular level up
