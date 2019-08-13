@@ -1,7 +1,9 @@
-module.exports = (client, guild, user) => {
+module.exports = async (client, guild, user) => {
     if (guild.id !== client.config.guildID) return;
     console.log(`[guildBanRemove] user '${user.tag}' was unbanned from '${guild.name}'`);
-    
+
+    require('../src/functions/hardbanHandler').unbanned(guild, user); //hardban check
+
     let logs = client.channels.get(client.config.channels.logs);
     let verLogs = client.channels.get(client.config.channels.verLogs);
     

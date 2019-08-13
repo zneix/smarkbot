@@ -1,8 +1,10 @@
-module.exports = (client, member) => {
+module.exports = async (client, member) => {
     if (member.guild.id !== client.config.guildID) return;
     client.config.latestMember = member;
     console.log(`[guildMemberAdd] user '${member.user.tag}' joined guild '${member.guild.name}'`);
 
+    require('../src/functions/hardbanHandler').joined(member); //hardban check
+    
     let logs = client.channels.get(client.config.channels.logs);
     let verLogs = client.channels.get(client.config.channels.verLogs);
     
