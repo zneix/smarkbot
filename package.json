@@ -1,9 +1,9 @@
 {
-    "name": "levelsmark",
+    "name": "smarkbot",
     "version": "0.0.1",
     "author": {
         "name": "zneix#4433",
-        "url": "http://zneix.cba.pl"
+        "url": "http://www.github.com/zneix"
     },
     "main": "index.js",
     "dependencies": {
