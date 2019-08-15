@@ -28,7 +28,7 @@ exports.run = (client, message) => {
                     }
                 ],
             }
-            return message.channel.send({embed:embed}).then(msg => msg.delete(90000));
+            return message.channel.send({embed:embed});
         }
         embed = { //send dynamic help
             color: 0x99ff66,
@@ -44,6 +44,6 @@ exports.run = (client, message) => {
                 },
             ],
         }
-        return message.channel.send({embed:embed}).then(msg => msg.delete(90000));
+        return message.channel.send({embed:embed});
     });
 }
