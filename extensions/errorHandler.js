@@ -16,18 +16,21 @@ Discord.Message.prototype.command = async function(num, func){
             console.trace(`Async/Promise rejection command error: ${err}`);
             var embed = {
                 color: 0xff5050,
+                timestamp: new Date(),
                 author: {
-                        name:this.guild.name+" — \""+this.channel.name+"\"",
+                        name: this.guild.name+" — \""+this.channel.name+"\"",
                         icon_url: this.author.avatarURL
-                    },
-                    description: "**"+this.author.username+"#"+this.author.discriminator+":"+this.author.id+"** failed to call: ***"+this.content+"***",
-                    fields:[
-                        {
-                            name: "Reason:",
-                            value: err.substring(0,1023),
-                        }
-                    ],
-                    timestamp: new Date()
+                },
+                footer: {
+                    text: "contact zneix#4433 for help"
+                },
+                description: "**"+this.author.username+"#"+this.author.discriminator+":"+this.author.id+"** failed to call: ***"+this.content+"***",
+                fields: [
+                    {
+                        name: "Reason:",
+                        value: err.substring(0,1023),
+                    }
+                ]
             }
             this.channel.send({embed:embed}).then(msg => {if (this.client.config.delete.error) msg.delete(this.client.config.delete.time)});
         });
@@ -36,18 +39,21 @@ Discord.Message.prototype.command = async function(num, func){
         console.trace(`Sync command error: ${error}`);
         var embed = {
             color: 0xff5050,
+            timestamp: new Date(),
             author: {
-                    name:this.guild.name+" — \""+this.channel.name+"\"",
+                    name: this.guild.name+" — \""+this.channel.name+"\"",
                     icon_url: this.author.avatarURL
-                },
-                description: "**"+this.author.username+"#"+this.author.discriminator+":"+this.author.id+"** failed to call: ***"+this.content+"***",
-                fields:[
-                    {
-                        name: "Reason:",
-                        value: error.substring(0,1023),
-                    }
-                ],
-                timestamp: new Date()
+            },
+            footer: {
+                text: "contact zneix#4433 for help"
+            },
+            description: "**"+this.author.username+"#"+this.author.discriminator+":"+this.author.id+"** failed to call: ***"+this.content+"***",
+            fields: [
+                {
+                    name: "Reason:",
+                    value: error.substring(0,1023),
+                }
+            ]
         }
         this.channel.send({embed:embed}).then(msg => {if (this.client.config.delete.error) msg.delete(this.client.config.delete.time)});
     }
