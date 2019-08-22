@@ -10,18 +10,18 @@ module.exports = (client, message, channel) => {
         color: 0x2b2321,
         timestamp: Date.now(),
         footer: {
-            text: `${user.id} | ${message.id}`,
-            icon_url: user.avatarURL
+            text: `${user?`${user.id} | `:''}${message.id}`,
+            icon_url: user?user.avatarURL:null
         },
         author: {
             name: `Message Deleted`,
-            icon_url: user.avatarURL
+            icon_url: user?user.avatarURL:''
         },
-        description: `${message.author?message.author:'unknown#0000'} in ${message.channel}`,
+        description: `${user?user:'unknown#0000'} in ${message.channel} ${user?` (after ${formattedMs(Date.now() - message.createdTimestamp)})`:""}`,
         fields: [
             {
                 name: "Deleted Message",
-                value: message.content?message.content:'null'
+                value: user?message.content?message.content:'null':"unknown, message wasn't cached before event emit"
             }
         ]
     }
