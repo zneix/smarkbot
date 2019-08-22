@@ -1,4 +1,5 @@
 module.exports = (client, message) => {
+    if (message.channel.type === "dm") return;
     if (message.guild.id !== client.config.guildID) return;
     if (message.author.bot) return;
 
