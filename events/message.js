@@ -42,6 +42,8 @@ module.exports = async (client, message) => {
         else {
             //message handling - levling system in action below
 
+            if (message.content.toLowerCase().startsWith('jd') || message.content.toLowerCase().startsWith('jebac') || message.content.toLowerCase().startsWith('jebać')) message.channel.send('jebać policję');
+            
             //escaping various conditions...
             if (client.config.modules.leveling.enabled === false) return;
             if (message.guild.id !== client.config.guildID) return; //guild
