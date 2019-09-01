@@ -42,7 +42,10 @@ module.exports = async (client, message) => {
         else {
             //message handling - levling system in action below
 
-            if (message.content.toLowerCase().startsWith('jd') || message.content.toLowerCase().startsWith('jebac') || message.content.toLowerCase().startsWith('jebać')) message.channel.send('jebać policję');
+            if (message.content.toLowerCase().startsWith('jd') || message.content.toLowerCase().startsWith('jp') || message.content.toLowerCase().startsWith('jebac') || message.content.toLowerCase().startsWith('jebać')) message.channel.send('jebać policję');
+            if (message.content.toLowerCase() === 'e') message.channel.send(client.emojis.find(e => e.name === "peepoHappyJAM"));
+            if (message.content.toLowerCase() === 'huj') message.channel.send(client.emojis.find(e => e.name === "forsenPls"));
+            if (message.content.toLowerCase().includes('peppah')) message.channel.send(client.emojis.find(e => e.name === "WAYTOODANK")+" "+client.emojis.find(e => e.name === "WutFace"));
             
             //escaping various conditions...
             if (client.config.modules.leveling.enabled === false) return;
