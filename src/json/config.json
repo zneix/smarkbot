@@ -19,6 +19,13 @@
         "gore": "593362236450537484"
     },
     "modules": {
+        "responses": {
+            "enabled": true,
+            "guilds": [
+                "489137343148851210",
+                "430436359556038668"
+            ]
+        },
         "leveling": {
             "enabled": false,
             "blacklist": [

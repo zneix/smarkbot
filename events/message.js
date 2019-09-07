@@ -41,13 +41,10 @@ module.exports = async (client, message) => {
         }
         else {
             //message handling - levling system in action below
-
-            if (message.content.toLowerCase().startsWith('jd') || message.content.toLowerCase().startsWith('jp') || message.content.toLowerCase().startsWith('jebac') || message.content.toLowerCase().startsWith('jebać')) message.channel.send('jebać policję');
-            if (message.content.toLowerCase() === 'e') message.channel.send(client.emojis.find(e => e.name === "peepoHappyJAM").toString());
-            if (message.content.toLowerCase() === 'huj') message.channel.send(client.emojis.find(e => e.name === "forsenPls").toString());
-            if (message.content.toLowerCase().includes('peppah')) message.channel.send(client.emojis.find(e => e.name === "WAYTOODANK")+" "+client.emojis.find(e => e.name === "WutFace"));
-            if (message.content.toLowerCase().includes('aniki') || message.content.toLowerCase().includes('billy')) message.channel.send(client.emojis.find(e => e.name === "PepeHands").toString());
-            
+            if (client.config.modules.responses.enabled) {
+                if (!client.config.modules.responses.guilds.includes(message.guild.id)) return;
+                require('../src/functions/responseHandler')(message.content.toLowerCase(), message, client);
+            }
             
             //escaping various conditions...
             if (client.config.modules.leveling.enabled === false) return;
