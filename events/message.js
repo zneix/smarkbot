@@ -37,7 +37,8 @@ module.exports = async (client, message) => {
                     throw "This command has unkown cmd.perms declaration!\nContact bot owner or see the switch-case module in message.js handler."
             }
             if (perms.ban.includes(message.author.id)) return message.react('🔨');
-            cmd.run(client, message);
+            if (message.guild !== client.guildID && cmd.home) throw "This command doesn't work outside my main server!";
+            else cmd.run(client, message);
         }
         else {
             //message handling - levling system in action below

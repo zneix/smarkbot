@@ -2,6 +2,7 @@ exports.name = `{PREFIX}${__filename.split(/[\\/]/).pop().slice(0,-3)}`;
 exports.description = `Makes me speak.`;
 exports.usage = `{PREFIX}${__filename.split(/[\\/]/).pop().slice(0,-3)} [channel ID | #channel]`
 exports.perms = 'supermod'
+exports.home = true
 
 exports.run = (client, message) => {
     message.command(1, async () => {
