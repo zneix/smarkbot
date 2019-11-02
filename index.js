@@ -3,7 +3,6 @@ const Discord = require('discord.js'); //discord core library
 const enmap = require('enmap'); //enmap object for command handler
 const fs = require('fs'); //filesystem module
 const schedule = require('node-schedule'); //yet useless
-const mysql = require('mysql2/promise'); //library for communicating with MySQL database (/peomise is for async/await)
 require('npm-package-to-env').config(); //importing version value from package.json
 require(`./extensions/errorHandler`); //handling thrown errors
 
@@ -26,7 +25,6 @@ client.RC = require('reaction-core'); //module for ahndling reactions
 client.RCHandler = new client.RC.Handler; //reaction-core handler
 client.fs = fs; //global filesystem module
 client.schedule = schedule; //yet useless
-client.mysql = mysql; //global mysql lib object (just in case)
 client.tr = new Set(); //set for talkedRecently (used by lidl leveling system)
 client.lvlcd = new Set(); //set for cooldowning level check command
 

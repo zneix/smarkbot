@@ -56,41 +56,42 @@ module.exports = async (client, message) => {
             if (message.guild.id !== client.config.guildID) return; //guild
             if (client.config.modules.leveling.blacklist.includes(message.channel.id) || client.config.modules.leveling.blocked.includes(message.author.id)) return; //bl channels, bl users
             if (client.tr.has(message.author.id)) return; //cooldowned users
+            return; //this will be redone later to MongoDB
 
-            //cooldown thingy
-            client.tr.add(message.author.id);
-            setTimeout(function() {client.tr.delete(message.author.id)}, 60000);
+            // //cooldown thingy
+            // client.tr.add(message.author.id);
+            // setTimeout(function() {client.tr.delete(message.author.id)}, 60000);
 
-            var conn = await mysql.createConnection(client.auth.db);
-            var [rows, fields] = await conn.query(`SELECT * FROM \`smarkbot_levels\` WHERE uid = ${message.author.id}`);
-            if (!rows.length) {
-                await conn.query(`INSERT INTO \`smarkbot_levels\` (pk, uid, xp, lvl) VALUES (NULL, ${message.author.id}, 0, 0)`);
-                return conn.destroy();
-            }
-            let random = Math.floor(15 + Math.random()*11);
-            let sum = 0;
-            let i = 0;
-            do {
-                sum = sum + (5 * Math.pow(i, 2) + 50 * i + 100);
-                i++;
-            } while (i < rows[0]["lvl"]+1);
-            if ((rows[0]["xp"]+random) > sum) {
-                //level up
-                if (client.config.modules.leveling.rewards[rows[0]["lvl"]+1]) {
-                    //level up with role reward
-                    let rewardRole = message.guild.roles.get(client.config.modules.leveling.rewards[`${rows[0]["lvl"]+1}`]);
-                    if (rewardRole) message.member.addRole(rewardRole);
-                    let deletRole = message.guild.roles.get(client.config.modules.leveling.rewards[`${rows[0]["lvl"]+1-4}`]);
-                    if (deletRole) message.member.removeRole(deletRole);
-                }
-                //regular level up
-                await conn.query(`UPDATE \`smarkbot_levels\` SET xp = ${rows[0]["xp"]+random}, lvl = ${rows[0]["lvl"]+1} WHERE uid = ${message.author.id}`);
-                require(`../src/embeds/levelUp`)(message, rows[0]["lvl"]+1); //annoucment and log
-                return conn.destroy();
-            }
-            //regular xp add
-            else await conn.query(`UPDATE \`smarkbot_levels\` SET xp = ${rows[0]["xp"]+random} WHERE uid =${message.author.id}`);
-            return conn.destroy();
+            // var conn = await mysql.createConnection(client.auth.db);
+            // var [rows, fields] = await conn.query(`SELECT * FROM \`smarkbot_levels\` WHERE uid = ${message.author.id}`);
+            // if (!rows.length) {
+            //     await conn.query(`INSERT INTO \`smarkbot_levels\` (pk, uid, xp, lvl) VALUES (NULL, ${message.author.id}, 0, 0)`);
+            //     return conn.destroy();
+            // }
+            // let random = Math.floor(15 + Math.random()*11);
+            // let sum = 0;
+            // let i = 0;
+            // do {
+            //     sum = sum + (5 * Math.pow(i, 2) + 50 * i + 100);
+            //     i++;
+            // } while (i < rows[0]["lvl"]+1);
+            // if ((rows[0]["xp"]+random) > sum) {
+            //     //level up
+            //     if (client.config.modules.leveling.rewards[rows[0]["lvl"]+1]) {
+            //         //level up with role reward
+            //         let rewardRole = message.guild.roles.get(client.config.modules.leveling.rewards[`${rows[0]["lvl"]+1}`]);
+            //         if (rewardRole) message.member.addRole(rewardRole);
+            //         let deletRole = message.guild.roles.get(client.config.modules.leveling.rewards[`${rows[0]["lvl"]+1-4}`]);
+            //         if (deletRole) message.member.removeRole(deletRole);
+            //     }
+            //     //regular level up
+            //     await conn.query(`UPDATE \`smarkbot_levels\` SET xp = ${rows[0]["xp"]+random}, lvl = ${rows[0]["lvl"]+1} WHERE uid = ${message.author.id}`);
+            //     require(`../src/embeds/levelUp`)(message, rows[0]["lvl"]+1); //annoucment and log
+            //     return conn.destroy();
+            // }
+            // //regular xp add
+            // else await conn.query(`UPDATE \`smarkbot_levels\` SET xp = ${rows[0]["xp"]+random} WHERE uid =${message.author.id}`);
+            // return conn.destroy();
         }
     }
     catch (err) {
