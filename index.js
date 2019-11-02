@@ -13,7 +13,7 @@ Promise.config({longStackTraces:true}); //enabling long stack trees
 //JSON data
 const config = require('./src/json/config.json');
 const perms = require('./src/json/perms.json');
-const auth = require('./src/json/auth')(Promise);
+const auth = require('./src/json/auth');
 
 //global Discord client extras
 const client = new Discord.Client(); //declaring new Discord client user as a global variable
