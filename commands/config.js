@@ -107,7 +107,11 @@ exports.run = async (client, message) => {
                     }
                     break;
                 case "leveling":
-                    embed.description = '';
+                    embed.description = '`enable / disable` - toggles whole module'
+                    +'\n`type` - type of announcing new messages: embed, react, dm, none'
+                    +'\n`blacklist` - manages channel blacklist'
+                    +'\n`block` - manages list of users excluded from leveling'
+                    +'\n`rewards` - manages role rewards';
                     embed.fields = null;
                     if (message.args[1]) switch(message.args[1].toLowerCase()){
                         default:
@@ -142,10 +146,13 @@ exports.run = async (client, message) => {
                     break;
             }
             embed.author.name = `${message.args[0].toLowerCase()} configuration, available options below`
-            async function updateRole(roleID){
+            function roleCheck(){
                 if (message.guild.roles.get(roleID).calculatedPosition >= message.guild.me.highestRole.calculatedPosition) throw "I can't manage this role because of role hierarchy!";
                 if (message.guild.roles.get(roleID).managed) throw "This role is a Discord integration role, it can't be managed!";
                 if (roleID === message.guild.id) throw "Really clever, but setting `@everyone` role would not break me - you can't manage it!";
+            }
+            async function updateRole(roleID){
+                roleCheck();
                 data.defaultrole = roleID;
                 await client.db.utils.replaceOne('guilds', {guildid: message.guild.id}, data);
                 embed.color = colors.success;
