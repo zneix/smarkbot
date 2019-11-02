@@ -28,7 +28,7 @@ Discord.Message.prototype.command = async function(num, func){
                 fields: [
                     {
                         name: "Reason:",
-                        value: err.substring(0,1023),
+                        value: err.toString().substring(0,1023),
                     }
                 ]
             }
@@ -51,7 +51,7 @@ Discord.Message.prototype.command = async function(num, func){
             fields: [
                 {
                     name: "Reason:",
-                    value: error.substring(0,1023),
+                    value: error.toString().substring(0,1023),
                 }
             ]
         }
