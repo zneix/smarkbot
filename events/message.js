@@ -1,8 +1,12 @@
 module.exports = async (client, message) => {
     if (message.author.bot || message.channel.type === "dm") return;
     try {
-        let prefix = function(){return message.content.substr(0, client.config.prefix.length).toLowerCase();}
-        if (prefix() == client.config.prefix) {
+        //defining prefix
+        let guildprefix = (await client.db.utils.find('guilds', {guildid: message.guild.id}))[0].customprefix;guildprefix = guildprefix===null?client.config.prefix:guildprefix;
+        //showing prefix on @Mention
+        if (message.content.startsWith(client.user)) message.channel.send(`Hey ${message.author}, my prefix in this server is \`${guildprefix}\``);
+        let prefix =  function(){return message.content.substr(0, guildprefix.length).toLowerCase();}
+        if (prefix() === guildprefix) {
             let command = function(){return message.content.split(/ +/g).shift(1).slice(prefix().length).toLowerCase();}
             //args declaration
             message.args = message.content.slice(prefix().length).split(/ +/g);

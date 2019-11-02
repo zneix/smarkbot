@@ -6,7 +6,7 @@ exports.home = false
 
 exports.run = (client, message) => {
     message.command(false, async () => {
-        var prefix = client.config.prefix;
+        let guildprefix = (await client.db.utils.find('guilds', {guildid: message.guild.id}))[0].customprefix;guildprefix = guildprefix===null?client.config.prefix:guildprefix;
         if (message.args.length) cmd = client.commands.get(message.args[0].toLowerCase());
         if (!message.args.length || !cmd) {
             let commandList = "";
@@ -21,7 +21,7 @@ exports.run = (client, message) => {
                 fields:[
                     {
                         name:"**Help**",
-                        value:`${cmd.usage.replace(/{PREFIX}/g, prefix)}`
+                        value:`${cmd.usage.replace(/{PREFIX}/g, guildprefix)}`
                     },
                     {
                         name: "List of all commands:",
@@ -34,14 +34,14 @@ exports.run = (client, message) => {
         embed = { //send dynamic help
             color: 0x99ff66,
             author: {
-                name:`${cmd.name.replace(/{PREFIX}/g, prefix)}`,
+                name:`${cmd.name.replace(/{PREFIX}/g, guildprefix)}`,
                 icon_url: client.user.avatarURL
             }, 
-            description:cmd.description.replace(/{PREFIX}/g, prefix),
+            description:cmd.description.replace(/{PREFIX}/g, guildprefix),
             fields:[
                 {
                     name:"**Usage:**",
-                    value:cmd.usage.replace(/{PREFIX}/g, prefix)
+                    value:cmd.usage.replace(/{PREFIX}/g, guildprefix)
                 },
             ],
         }
