@@ -35,4 +35,9 @@ require(`./src/functions/loadEvents`)(client); //event handler
 require(`./src/functions/loadCommands`)(client); //command handler
 
 //Discord authentication
-client.login(auth.token); //with Discord bot token
+client.db = require('./src/functions/mongodb');
+client.db.connect((err, mongoclient) => {
+    if (err) return console.error(`[!mongodb] Error while connecting:\n${err}`);
+    console.log('[mongodb] connected to mongodb!');
+    client.login(auth.token); //with Discord bot token
+});
