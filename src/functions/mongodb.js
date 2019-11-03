@@ -44,6 +44,7 @@ client.utils.newGuildConfig = async function(guildid){
 	let template = {
 		guildid: guildid,
 		customprefix: null,
+		defaultrole: null,
 		modules: {
 			leveling: {
 				enabled: false,
