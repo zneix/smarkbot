@@ -39,6 +39,36 @@ client.utils.replaceOne = async function(collectionName, filter, doc){
     return await client.db().collection(collectionName).findOneAndReplace(filter, doc);
 }
 
+//new config template insertion
+client.utils.newGuildConfig = async function(guildid){
+	let template = {
+		guildid: guildid,
+		customprefix: null,
+		modules: {
+			leveling: {
+				enabled: false,
+				announcetype: 'embed',
+				blacklist: [],
+				blocked: [],
+				rewards: {}
+			},
+			responses: {
+				enabled: false
+			},
+			roles: {
+				enabled: false,
+				units: {}
+			},
+			logging: {
+				enabled: false,
+				joinleave: null,
+				message: null
+			}
+		}
+	}
+	return await client.db().collection('guilds').insertOne(template);
+}
+
 //mongodb-related listeners for topology and failed heartbeats information
 client.on('serverHeartbeatFailed', function(event) {
 	console.log('[mongodb:event] Heartbeat FAILED!');
