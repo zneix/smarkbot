@@ -1,7 +1,14 @@
 let mongodb = require('mongodb');
 let auth = require('../json/auth');
 let uri = `mongodb+srv://${auth.db.user}:${auth.db.pass}@${auth.db.host}/smarkbot`;
-let client = new mongodb.MongoClient(uri, {useUnifiedTopology: true});
+let client = new mongodb.MongoClient(uri, {
+	useUnifiedTopology: true,
+	keepAlive: true,
+	poolSize: 30,
+	autoReconnect: true,
+	socketTimeoutMS: 360000,
+	connectTimeoutMS: 360000
+});
 
 //mongodb utils
 client.utils = new Object;
