@@ -57,17 +57,11 @@ exports.run = async (client, message) => {
                     case "set":
                         if (!message.args[2]) throw 'You must specify the new config name!';
                         data.customprefix = message.args[2].toLowerCase();
-                        await client.db.utils.replaceOne('guilds', {guildid: message.guild.id}, data);
-                        embed.color = colors.success;
-                        embed.author.name = 'Success!';
-                        embed.description = `Successfully updated custom prefix for ${message.guild.name} to \`${data.customprefix}\``;
+                        await updateConfig(`Successfully updated custom prefix for ${message.guild.name} to \`${data.customprefix}\``);
                         break;
                     case "reset":
                         data.customprefix = null;
-                        await client.db.utils.replaceOne('guilds', {guildid: message.guild.id}, data);
-                        embed.color = colors.success;
-                        embed.author.name = 'Success!';
-                        embed.description = `Successfully deleted custom prefix for **${message.guild.name}**\nBot will now react to default prefix: \`${client.config.prefix}\``;
+                        await updateConfig(`Successfully deleted custom prefix for **${message.guild.name}**\nBot will now react to default prefix: \`${client.config.prefix}\``);
                         break;
                     default:
                         break;
@@ -97,10 +91,7 @@ exports.run = async (client, message) => {
                             break;
                         case "reset":
                             data.defaultrole = null;
-                            await client.db.utils.replaceOne('guilds', {guildid: message.guild.id}, data);
-                            embed.color = colors.success;
-                            embed.author.name = 'Success!';
-                            embed.description = `Successfully deleted default role for **${message.guild.name}**`;
+                            await updateConfig(`Successfully deleted default role for **${message.guild.name}**`);
                             break;
                         default:
                             break;
@@ -108,12 +99,31 @@ exports.run = async (client, message) => {
                     break;
                 case "leveling":
                     embed.description = '`enable / disable` - toggles whole module'
-                    +'\n`type` - type of announcing new messages: embed, react, dm, none'
+                    +'\n`type` - type of announcing level-up: embed, react, dm, none'
                     +'\n`blacklist` - manages channel blacklist'
                     +'\n`block` - manages list of users excluded from leveling'
                     +'\n`rewards` - manages role rewards';
-                    embed.fields = null;
+                    embed.fields = [
+                        {
+                            name: 'note',
+                            value: 'Kappa Shift 77' //finish note
+                        }
+                    ];
                     if (message.args[1]) switch(message.args[1].toLowerCase()){
+                        case "enable":
+                            data.modules.leveling.enabled = true;
+                            await updateConfig(`Leveling system is now __**enabled**__ in **${message.guild.name}**!`);
+                            break;
+                        case "disable":
+                            data.modules.leveling.enabled = false;
+                            await updateConfig(`Leveling system is now __**disabled**__ in **${message.guild.name}**!`);
+                            break;
+                        case "blacklist":
+                            break;
+                        case "block":
+                            break;
+                        case "rewards":
+                            break;
                         default:
                             break;
                     }
@@ -145,7 +155,7 @@ exports.run = async (client, message) => {
                 default:
                     break;
             }
-            embed.author.name = `${message.args[0].toLowerCase()} configuration, available options below`
+            embed.author.name = `${message.args[0].toLowerCase()} configuration, available options below`;
             function roleCheck(){
                 if (message.guild.roles.get(roleID).calculatedPosition >= message.guild.me.highestRole.calculatedPosition) throw "I can't manage this role because of role hierarchy!";
                 if (message.guild.roles.get(roleID).managed) throw "This role is a Discord integration role, it can't be managed!";
@@ -154,10 +164,13 @@ exports.run = async (client, message) => {
             async function updateRole(roleID){
                 roleCheck();
                 data.defaultrole = roleID;
+                await updateConfig(`Successfully updated default role for ${message.guild.name} to <@&${data.defaultrole}> (${data.defaultrole})`);
+            }
+            async function updateConfig(msg){
                 await client.db.utils.replaceOne('guilds', {guildid: message.guild.id}, data);
                 embed.color = colors.success;
-                embed.author.name = 'Success!';
-                embed.description = `Successfully updated default role for ${message.guild.name} to <@&${data.defaultrole}> (${data.defaultrole})`;
+                embed.color.name = 'Success!';
+                embed.description = msg;
             }
         }
         message.channel.send({embed:embed});
