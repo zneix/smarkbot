@@ -1,5 +1,5 @@
 exports.name = `{PREFIX}${__filename.split(/[\\/]/).pop().slice(0,-3)}`;
-exports.description = `Changes bot prefix`;
+exports.description = `Changes bot configuration for current server.`;
 exports.usage = `{PREFIX}${__filename.split(/[\\/]/).pop().slice(0,-3)}`;
 exports.perms = `owner`;
 exports.home = false;
@@ -7,7 +7,7 @@ exports.home = false;
 exports.run = async (client, message) => {
     message.command(false, async () => {
         let data = (await client.db.utils.find('guilds', {guildid: message.guild.id}))[0];
-        console.log(data);
+        // console.log(data);
         let colors = {
             native: 0xda7678,
             success: 0x51d559
@@ -35,7 +35,7 @@ exports.run = async (client, message) => {
                     value:
                     `prefix - ${data.customprefix?data.customprefix:(`${client.config.prefix} (default)`)}`
                     +`\ndefaultrole - ${data.defaultrole?`<@&${data.defaultrole}> (${data.defaultrole})`:'none'}`
-                    +`\nleveling - ${data.modules.leveling.enabled?'enabled':'disabled'}, ${Object.getOwnPropertyNames(data.modules.leveling.rewards).length} rewards`
+                    +`\nleveling - ${data.modules.leveling.enabled?'enabled':'disabled'}, ${Object.getOwnPropertyNames(data.modules.leveling.rewards).length} rewards; level-ups: ${data.modules.leveling.announcetype}`
                     +`\nresponses - ${data.modules.responses.enabled?'enabled':'disabled'}`
                     +`\nautorole - ${data.modules.roles.enabled?'enabled':'disabled'}, ${Object.getOwnPropertyNames(data.modules.roles.units).length} configured roles`
                     +`\nlogging - ${data.modules.logging.enabled?'enabled':'disabled'}, join/leave: ${data.modules.logging.joinleave?`<#${data.modules.logging.joinleave}>`:'none'}, message: ${data.modules.logging.message?`<#${data.modules.logging.message}>`:'none'}`
@@ -43,6 +43,7 @@ exports.run = async (client, message) => {
             ]
         }
         if (message.args.length) {
+            embed.author.name = `${message.args[0].toLowerCase()} configuration, available options below`;
             switch(message.args[0].toLowerCase()){
                 case "prefix":
                 embed.description = '`set <new_prefix>` - changes prefix to given value (no spaces)'
@@ -57,18 +58,19 @@ exports.run = async (client, message) => {
                     case "set":
                         if (!message.args[2]) throw 'You must specify the new config name!';
                         data.customprefix = message.args[2].toLowerCase();
-                        await updateConfig(`Successfully updated custom prefix for ${message.guild.name} to \`${data.customprefix}\``);
+                        await updateConfig(`Successfully updated custom prefix for **${message.guild.name}** to \`${data.customprefix}\``);
                         break;
                     case "reset":
+                    case "clear":
                         data.customprefix = null;
-                        await updateConfig(`Successfully deleted custom prefix for **${message.guild.name}**\nBot will now react to default prefix: \`${client.config.prefix}\``);
+                        await updateConfig(`Successfully deleted custom prefix for **${message.guild.name}**\nBot will now react to default prefix: \`${client.config.prefix}\``, null);
                         break;
                     default:
                         break;
                     }
                     break;
                 case "defaultrole":
-                        embed.description = '`set <role_ID_or_@Role>` - changes default role to given value, can be either role id or directly @Mentioned'
+                        embed.description = '`set <ID_or_@Role>` - changes default role to given value, can be either role ID or direct role @Mention'
                         +'\n`reset` - removes default role from configuration';
                     embed.fields = [
                         {
@@ -90,8 +92,9 @@ exports.run = async (client, message) => {
                             await updateRole(message.args[2]);
                             break;
                         case "reset":
+                        case "clear":
                             data.defaultrole = null;
-                            await updateConfig(`Successfully deleted default role for **${message.guild.name}**`);
+                            await updateConfig(`Successfully deleted default role for **${message.guild.name}**`, null);
                             break;
                         default:
                             break;
@@ -106,30 +109,227 @@ exports.run = async (client, message) => {
                     embed.fields = [
                         {
                             name: 'note',
-                            value: 'Kappa Shift 77' //finish note
+                            value: 'use one of above options to get more help' //finish note
                         }
                     ];
                     if (message.args[1]) switch(message.args[1].toLowerCase()){
                         case "enable":
                             data.modules.leveling.enabled = true;
-                            await updateConfig(`Leveling system is now __**enabled**__ in **${message.guild.name}**!`);
+                            await updateConfig(`Leveling system is now __**enabled**__ in **${message.guild.name}**!`, null);
                             break;
                         case "disable":
                             data.modules.leveling.enabled = false;
-                            await updateConfig(`Leveling system is now __**disabled**__ in **${message.guild.name}**!`);
+                            await updateConfig(`Leveling system is now __**disabled**__ in **${message.guild.name}**!`, null);
+                            break;
+                        case "type":
+                                embed.description = '`embed` - shows level-up embed messages in current channel'
+                                +'\n`react` - type of announcing level-up: embed, react, dm, none'
+                                +'\n`dm` - sends level-up message directly to the user'
+                                +'\n`none` - completely disables announcing level-ups'
+                                embed.fields[0].value = `This option changes default bot's behavoir when someone levels up\nCurrent setting: \`${data.modules.leveling.announcetype}\``;
+                                if (message.args[2]) switch(message.args[2].toLowerCase()){
+                                    case "embed":
+                                        data.modules.leveling.announcetype = 'embed';
+                                        await updateConfig(`Changed type of level up announces to __embed messages__`, null);
+                                        break;
+                                    case "react":
+                                        data.modules.leveling.announcetype = 'react';
+                                        await updateConfig(`Changed type of level up announces to __reactions__`, null);
+                                        break;
+                                    case "dm":
+                                        data.modules.leveling.announcetype = 'dm';
+                                        await updateConfig(`Changed type of level up announces to __direct messages__`, null);
+                                        break;
+                                    case "none":
+                                        data.modules.leveling.announcetype = 'none';
+                                        await updateConfig(`__Disabled__ level up announces completely`, null);
+                                        break;
+                                    default:
+                                        break;
+                                }
                             break;
                         case "blacklist":
+                            embed.description = '`add <ID_or_#Channel>` - adds specified channel to blacklist'
+                            +'\n`remove <ID_or_#Channel>` - removes specified channel from blacklist'
+                            +'\n`clear` - clears blacklist restriction';
+                            let blacklist = [];
+                            data.modules.leveling.blacklist.forEach(chid => blacklist.push(`<#${chid}>`));
+                            embed.fields[0].name = `Current list of channels that are excluded from getting xp in them [${data.modules.leveling.blacklist.length}]`;
+                            embed.fields[0].value = blacklist.length?blacklist.join('\n'):'There are no blacklisted channels.';
+                            if (message.args[2]) switch(message.args[2].toLowerCase()){
+                                case "add":
+                                    if (!message.args[3]) throw 'You must specify Channel ID or mention it via #Channel';
+                                    if (message.mentions.channels.size) {
+                                        if (message.guild.channels.has(message.mentions.channels.first().id) && message.args[3].includes(message.mentions.channels.first().id)){
+                                            //success from mention
+                                            data.modules.leveling.blacklist.push(message.mentions.channels.first().id);
+                                            await updateConfig(`Channel <#${message.mentions.channels.first().id}> (${message.mentions.channels.first().id}) has been added to blacklist.`, null);
+                                            break;
+                                        }
+                                        throw 'Mentioned channel is not a part of current server!';
+                                    }
+                                    if (!message.guild.channels.has(message.args[3])) throw "Channel with given ID is not a part of current server!";
+                                    //success from ID
+                                    data.modules.leveling.blacklist.push(message.args[3]);
+                                    await updateConfig(`Channel <#${message.args[3]}> (${message.args[3]}) has been added to blacklist.`, null);
+                                    break;
+                                case "remove":
+                                    if (!message.args[3]) throw 'You must specify Channel ID or mention it via #Channel';
+                                    if (message.mentions.channels.size) {
+                                        if (message.guild.channels.has(message.mentions.channels.size.first().id) && message.args[3].includes(message.mentions.channels.size.first().id)){
+                                            //success from mention
+                                            let index = data.modules.leveling.blacklist.indexOf(message.mentions.channels.size.first().id);
+                                            if (index > -1) data.modules.leveling.blacklist.splice(index, 1);
+                                            await updateConfig(`Channel <#${message.mentions.channels.size.first().id}> (${message.mentions.channels.size.first().id}) has been added to blacklist.`, null);
+                                            break;
+                                        }
+                                        throw 'Mentioned channel is not a part of current server!';
+                                    }
+                                    if (!message.guild.channels.has(message.args[3])) throw "Channel with given ID is not a part of current server!";
+                                    //success from ID
+                                    let index = data.modules.leveling.blacklist.indexOf(message.args[3]);
+                                    if (index > -1) data.modules.leveling.blacklist.splice(index, 1);
+                                    await updateConfig(`Channel <#${message.args[3]}> (${message.args[3]}) has been added to blacklist.`, null);
+                                    break;
+                                case "reset":
+                                case "clear":
+                                    data.modules.leveling.blacklist = [];
+                                    await updateConfig(`Blacklist for **${message.guild.name}** has been cleared`, [{name:'note',value:'xp will be now granted for chatting in every channel, even spammy command ones'}]);
+                                    break;
+                                default:
+                                    break;
+                            }
                             break;
                         case "block":
+                            embed.description = '`add <ID_or_@Mention>` - adds specified user to blocked'
+                            +'\n`remove <ID_or_@Mention>` - removes specified user from blocked'
+                            +'\n`clear` - clears blocked restriction';
+                            let blocked = [];
+                            data.modules.leveling.blocked.forEach(chid => blocked.push(`<@${chid}>`));
+                            embed.fields[0].name = `Current list of users that are excluded from getting xp`;
+                            embed.fields[0].value = blocked.length?blocked.join('\n'):'There are no blocked users.';
+                            if (message.args[2]) switch (message.args[2].toLowerCase()){
+                                case "add":
+                                    if (!message.args[3]) throw 'You must specify user by their ID or @Mention it!';
+                                    if (message.mentions.members.size) {
+                                        if (message.guild.members.has(message.mentions.members.first().id) && message.args[3].includes(message.mentions.members.first().id)){
+                                            //success from mention
+                                            data.modules.leveling.blocked.push(message.mentions.members.first().id);
+                                            await updateConfig(`User <@${message.mentions.members.first().id}> (${message.mentions.members.first().id}) has been blocked from getting xp.`, null);
+                                            break;
+                                        }
+                                        throw 'Mentioned user is not a part of current server!';
+                                    }
+                                    if (!message.guild.members.has(message.args[3])) throw 'User with given ID is not a part of current server!';
+                                    //success from ID
+                                    data.modules.leveling.blocked.push(message.args[3]);
+                                    await updateConfig(`User <@${message.args[3]}> (${message.args[3]}) has been blocked from getting xp.`, null);
+                                    break;
+                                case "remove":
+                                    if (!message.args[3]) throw 'You must specify User ID or @Mention it!';
+                                    if (message.mentions.members.size) {
+                                        if (message.guild.members.has(message.mentions.members.first().id) && message.args[3].includes(message.mentions.members.first().id)){
+                                            //success from mention
+                                            let index = data.modules.leveling.blocked.indexOf(message.mentions.members.first().id);
+                                            if (index > -1) data.modules.leveling.blocked.splice(index, 1);
+                                            await updateConfig(`User <@${message.mentions.members.first().id}> (${message.mentions.members.first().id}) has been unblocked.`, null);
+                                            break;
+                                        }
+                                        throw 'Mentioned user is not a part of current server!';
+                                    }
+                                    if (!message.guild.members.has(message.args[3])) throw 'User with given ID is not a part of current server!';
+                                    //success from ID
+                                    let index = data.modules.leveling.blocked.indexOf(message.args[3]);
+                                    if (index > -1) data.modules.leveling.blocked.splice(index, 1);
+                                    await updateConfig(`User <@${message.args[3]}> (${message.args[3]}) has been unblocked.`, null);
+                                    break;
+                                case "reset":
+                                case "clear":
+                                    data.modules.leveling.blocked = [];
+                                    await updateConfig(`Cleared user restriction for **${message.guild.name}**`, [{name:'note',value:'xp will be now granted for every single user except for bots'}]);
+                                    break;
+                                default:
+                                    break;
+                            }
                             break;
                         case "rewards":
+                            embed.description = '`add <level> <ID_or_@Mention>` - adds specified reward'
+                            +'\n`remove <level> <ID_or_@Mention>` - removes specified reward'
+                            +'\n`reset` - removes all the rewards';
+                            if (!message.args[2]){
+                                embed.fields[0].name = 'Currently configured rewards';
+                                let rewArr = [];
+                                let rewardLevels = Object.getOwnPropertyNames(data.modules.leveling.rewards);
+                                if (rewardLevels.length){
+                                    let n = Math.max.apply(Math, rewardLevels);
+                                    for (i=0;i<=n;i++){
+                                        if (rewardLevels.includes(i.toString())) {
+                                            let subRewArr = [];
+                                            subRewArr.push(`Level ${i}: `);
+                                            rewardLevels.forEach(level => {
+                                                if (level == i) subRewArr.push(`<@&${data.modules.leveling.rewards[level]}> (${data.modules.leveling.rewards[level]})`);
+                                            });
+                                            rewArr.push(subRewArr.join(' '));
+                                        }
+                                    }
+                                    embed.fields[0].value = rewArr.join('\n').length<1020?rewArr.join('\n'):rewArr.join('\n').substr(0, 1012).concat(' [truncated]');
+                                }
+                                else embed.fields[0].value = 'There are no rewards configured.';
+                            }
+                            //further configuration
+                            else {
+                                switch(message.args[2].toLowerCase()){
+                                    case "add":
+                                        embed.fields = null;
+                                        if (!message.guild.me.hasPermission('MANAGE_ROLES')) throw "I don't have **MANAGE_ROLES** permission here, so I can't use reward system here!";
+                                        if (!message.args[3] || !message.args[4]) throw 'You must specify both level __and__ role by its ID or direct @Mention';
+                                        if (!Number.isInteger(parseInt(message.args[3])) || !(/\d+/.test(message.args[3]))) throw `\`${message.args[3]}\` is not a valid positive number`;
+                                        if (message.args[3] > 200) throw 'Bot supports level rewards can not be set above level 200!';
+                                        if (!message.guild.roles.has(message.args[4])){
+                                            if (message.mentions.roles.size && message.args[4].includes(message.mentions.roles.first().id)){
+                                                data.modules.leveling.rewards[message.args[3]] = message.mentions.roles.first().id;
+                                                await updateRole(message.mentions.roles.first().id, {added: true, lvl: message.args[3]});
+                                                break;
+                                            }
+                                            throw 'This is not a valid role ID nor @Mention!';
+                                        }
+                                        data.modules.leveling.rewards[message.args[3]] = message.args[4];
+                                        await updateRole(message.args[4], {added: true, lvl: message.args[3]});
+                                        break;
+                                    case "remove":
+                                        embed.fields = null;
+                                        if (!message.guild.me.hasPermission('MANAGE_ROLES')) throw "I don't have **MANAGE_ROLES** permission here, so I can't use reward system here!";
+                                        if (!message.args[3] || !message.args[4]) throw 'You must specify both level __and__ role by its ID or direct @Mention';
+                                        if (!Number.isInteger(parseInt(message.args[3])) || !(/\d+/.test(message.args[3]))) throw `\`${message.args[3]}\` is not a valid positive number`;
+                                        if (message.args[3] > 200) throw 'Bot supports level rewards can not be set above level 200!';
+                                        if (!message.guild.roles.has(message.args[4])){
+                                            if (message.mentions.roles.size && message.args[4].includes(message.mentions.roles.first().id)){
+                                                delete data.modules.leveling.rewards[message.args[3]];
+                                                await updateRole(message.mentions.roles.first().id, {added: false, lvl: message.args[3]});
+                                                break;
+                                            }
+                                            throw 'This is not a valid role ID nor @Mention!';
+                                        }
+                                        delete data.modules.leveling.rewards[message.args[3]];
+                                        await updateRole(message.args[4], {added: false, lvl: message.args[3]});
+                                        break;
+                                    case "reset":
+                                    case "clear":
+                                        embed.fields = null;
+                                        data.modules.leveling.rewards = {};
+                                        await updateConfig(`Cleared all role rewards for **${message.guild.name}**`, null);
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
                             break;
                         default:
                             break;
                     }
                     break;
                 case "responses":
-                    embed.description = '';
+                    embed.description = '`enable \ disable`';
                     embed.fields = null;
                     if (message.args[1]) switch(message.args[1].toLowerCase()){
                         default:
@@ -137,15 +337,15 @@ exports.run = async (client, message) => {
                     }
                     break;
                 case "autorole":
-                    embed.description = '';
+                    embed.description = '`enable \ disable`';
                     embed.fields = null;
                     if (message.args[1]) switch(message.args[1].toLowerCase()){
                         default:
                             break;
                     }
                     break;
-                case "logging":
-                    embed.description = '';
+                    case "logging":
+                        embed.description = '`enable \ disable`';
                     embed.fields = null;
                     if (message.args[1]) switch(message.args[1].toLowerCase()){
                         default:
@@ -155,22 +355,22 @@ exports.run = async (client, message) => {
                 default:
                     break;
             }
-            embed.author.name = `${message.args[0].toLowerCase()} configuration, available options below`;
-            function roleCheck(){
-                if (message.guild.roles.get(roleID).calculatedPosition >= message.guild.me.highestRole.calculatedPosition) throw "I can't manage this role because of role hierarchy!";
-                if (message.guild.roles.get(roleID).managed) throw "This role is a Discord integration role, it can't be managed!";
-                if (roleID === message.guild.id) throw "Really clever, but setting `@everyone` role would not break me - you can't manage it!";
+            function roleCheck(role){
+                if (message.guild.roles.get(role).calculatedPosition >= message.guild.me.highestRole.calculatedPosition) throw "I can't manage this role because of role hierarchy!";
+                if (message.guild.roles.get(role).managed) throw "This role is a Discord integration role, it can't be managed!";
+                if (role === message.guild.id) throw "Really clever, but setting `@everyone` role would not break me - you can't manage it!";
             }
-            async function updateRole(roleID){
-                roleCheck();
-                data.defaultrole = roleID;
-                await updateConfig(`Successfully updated default role for ${message.guild.name} to <@&${data.defaultrole}> (${data.defaultrole})`);
+            async function updateRole(roleID, reward){
+                roleCheck(roleID);
+                if (!reward) data.defaultrole = roleID;
+                await updateConfig(reward?`Successfully __${reward.added?'added':'removed'}__ reward <@&${roleID}> (${roleID}) for level __${reward.lvl}__`:`Successfully updated default role for **${message.guild.name}** to <@&${data.defaultrole}> (${data.defaultrole})`);
             }
-            async function updateConfig(msg){
+            async function updateConfig(msg, fields){
                 await client.db.utils.replaceOne('guilds', {guildid: message.guild.id}, data);
                 embed.color = colors.success;
-                embed.color.name = 'Success!';
+                embed.author.name = 'Success!';
                 embed.description = msg;
+                if (fields || fields === null) embed.fields = fields;
             }
         }
         message.channel.send({embed:embed});
