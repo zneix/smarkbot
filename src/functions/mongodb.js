@@ -30,13 +30,20 @@ client.utils.find = async function(collectionName, filter){
 	if (!collectionName) return "collection name can't be null";
 	return await client.db().collection(collectionName).find(filter).toArray();
 }
+//inserting documents
 client.utils.insert = async function(collectionName, docs){
 	if (!collectionName) return "collection name can't be null";
 	return await client.db().collection(collectionName).insertMany(docs);
 }
+//updating single document
 client.utils.replaceOne = async function(collectionName, filter, doc){
     if (!collectionName) return "collection name can't be null";
     return await client.db().collection(collectionName).findOneAndReplace(filter, doc);
+}
+//deleting documents
+client.utils.delete = async function(collectionName, filter){
+	if (!collectionName) return "collection name can't be null";
+	return await client.db().collection(collectionName).deleteMany(filter);
 }
 
 //new config template insertion
