@@ -7,6 +7,7 @@ exports.home = false;
 exports.run = async (client, message) => {
     message.command(false, async () => {
         let data = (await client.db.utils.find('guilds', {guildid: message.guild.id}))[0];
+        console.log(data.modules)
         // console.log(data);
         let colors = {
             native: 0xda7678,
@@ -256,98 +257,125 @@ exports.run = async (client, message) => {
                             embed.description = '`add <level> <ID_or_@Mention>` - adds specified reward'
                             +'\n`remove <level> <ID_or_@Mention>` - removes specified reward'
                             +'\n`reset` - removes all the rewards';
-                            if (!message.args[2]){
-                                embed.fields[0].name = 'Currently configured rewards';
-                                let rewArr = [];
-                                let rewardLevels = Object.getOwnPropertyNames(data.modules.leveling.rewards);
-                                if (rewardLevels.length){
-                                    let n = Math.max.apply(Math, rewardLevels);
-                                    for (i=0;i<=n;i++){
-                                        if (rewardLevels.includes(i.toString())) {
-                                            let subRewArr = [];
-                                            subRewArr.push(`Level ${i}: `);
-                                            rewardLevels.forEach(level => {
-                                                if (level == i) subRewArr.push(`<@&${data.modules.leveling.rewards[level]}> (${data.modules.leveling.rewards[level]})`);
-                                            });
-                                            rewArr.push(subRewArr.join(' '));
-                                        }
+                            embed.fields[0].name = 'Currently configured rewards';
+                            let rewArr = [];
+                            let rewardLevels = Object.getOwnPropertyNames(data.modules.leveling.rewards);
+                            if (rewardLevels.length){
+                                let n = Math.max.apply(Math, rewardLevels);
+                                for (i=0;i<=n;i++){
+                                    if (rewardLevels.includes(i.toString())) {
+                                        let subRewArr = [];
+                                        subRewArr.push(`Level ${i}: `);
+                                        rewardLevels.forEach(level => {
+                                            if (level == i) subRewArr.push(`<@&${data.modules.leveling.rewards[level]}> (${data.modules.leveling.rewards[level]})`);
+                                        });
+                                        rewArr.push(subRewArr.join(' '));
                                     }
-                                    embed.fields[0].value = rewArr.join('\n').length<1020?rewArr.join('\n'):rewArr.join('\n').substr(0, 1012).concat(' [truncated]');
                                 }
-                                else embed.fields[0].value = 'There are no rewards configured.';
+                                embed.fields[0].value = rewArr.join('\n').length<1020?rewArr.join('\n'):rewArr.join('\n').substr(0, 1012).concat(' [truncated]');
                             }
+                            else embed.fields[0].value = 'There are no rewards configured.';
                             //further configuration
-                            else {
-                                switch(message.args[2].toLowerCase()){
-                                    case "add":
-                                        embed.fields = null;
-                                        if (!message.guild.me.hasPermission('MANAGE_ROLES')) throw "I don't have **MANAGE_ROLES** permission here, so I can't use reward system here!";
-                                        if (!message.args[3] || !message.args[4]) throw 'You must specify both level __and__ role by its ID or direct @Mention';
-                                        if (!Number.isInteger(parseInt(message.args[3])) || !(/\d+/.test(message.args[3]))) throw `\`${message.args[3]}\` is not a valid positive number`;
-                                        if (message.args[3] > 200) throw 'Bot supports level rewards can not be set above level 200!';
-                                        if (!message.guild.roles.has(message.args[4])){
-                                            if (message.mentions.roles.size && message.args[4].includes(message.mentions.roles.first().id)){
-                                                data.modules.leveling.rewards[message.args[3]] = message.mentions.roles.first().id;
-                                                await updateRole(message.mentions.roles.first().id, {added: true, lvl: message.args[3]});
-                                                break;
-                                            }
-                                            throw 'This is not a valid role ID nor @Mention!';
+                            if (message.args[2]) switch(message.args[2].toLowerCase()){
+                                case "add":
+                                    embed.fields = null;
+                                    if (!message.guild.me.hasPermission('MANAGE_ROLES')) throw "I don't have **MANAGE_ROLES** permission here, so I can't use reward system here!";
+                                    if (!message.args[3] || !message.args[4]) throw 'You must specify both level __and__ role by its ID or direct @Mention';
+                                    if (!Number.isInteger(parseInt(message.args[3])) || !(/\d+/.test(message.args[3]))) throw `\`${message.args[3]}\` is not a valid positive number`;
+                                    if (message.args[3] > 200) throw 'Bot supports level rewards can not be set above level 200!';
+                                    if (!message.guild.roles.has(message.args[4])){
+                                        if (message.mentions.roles.size && message.args[4].includes(message.mentions.roles.first().id)){
+                                            data.modules.leveling.rewards[message.args[3]] = message.mentions.roles.first().id;
+                                            await updateRole(message.mentions.roles.first().id, {added: true, lvl: message.args[3]});
+                                            break;
                                         }
-                                        data.modules.leveling.rewards[message.args[3]] = message.args[4];
-                                        await updateRole(message.args[4], {added: true, lvl: message.args[3]});
-                                        break;
-                                    case "remove":
-                                        embed.fields = null;
-                                        if (!message.guild.me.hasPermission('MANAGE_ROLES')) throw "I don't have **MANAGE_ROLES** permission here, so I can't use reward system here!";
-                                        if (!message.args[3] || !message.args[4]) throw 'You must specify both level __and__ role by its ID or direct @Mention';
-                                        if (!Number.isInteger(parseInt(message.args[3])) || !(/\d+/.test(message.args[3]))) throw `\`${message.args[3]}\` is not a valid positive number`;
-                                        if (message.args[3] > 200) throw 'Bot supports level rewards can not be set above level 200!';
-                                        if (!message.guild.roles.has(message.args[4])){
-                                            if (message.mentions.roles.size && message.args[4].includes(message.mentions.roles.first().id)){
-                                                delete data.modules.leveling.rewards[message.args[3]];
-                                                await updateRole(message.mentions.roles.first().id, {added: false, lvl: message.args[3]});
-                                                break;
-                                            }
-                                            throw 'This is not a valid role ID nor @Mention!';
+                                        throw 'This is not a valid role ID nor @Mention!';
+                                    }
+                                    data.modules.leveling.rewards[message.args[3]] = message.args[4];
+                                    await updateRole(message.args[4], {added: true, lvl: message.args[3]});
+                                    break;
+                                case "remove":
+                                    embed.fields = null;
+                                    if (!message.guild.me.hasPermission('MANAGE_ROLES')) throw "I don't have **MANAGE_ROLES** permission here, so I can't use reward system here!";
+                                    if (!message.args[3] || !message.args[4]) throw 'You must specify both level __and__ role by its ID or direct @Mention';
+                                    if (!Number.isInteger(parseInt(message.args[3])) || !(/\d+/.test(message.args[3]))) throw `\`${message.args[3]}\` is not a valid positive number`;
+                                    if (message.args[3] > 200) throw 'Bot supports level rewards can not be set above level 200!';
+                                    if (!message.guild.roles.has(message.args[4])){
+                                        if (message.mentions.roles.size && message.args[4].includes(message.mentions.roles.first().id)){
+                                            delete data.modules.leveling.rewards[message.args[3]];
+                                            await updateRole(message.mentions.roles.first().id, {added: false, lvl: message.args[3]});
+                                            break;
                                         }
-                                        delete data.modules.leveling.rewards[message.args[3]];
-                                        await updateRole(message.args[4], {added: false, lvl: message.args[3]});
-                                        break;
-                                    case "reset":
-                                    case "clear":
-                                        embed.fields = null;
-                                        data.modules.leveling.rewards = {};
-                                        await updateConfig(`Cleared all role rewards for **${message.guild.name}**`, null);
-                                        break;
-                                    default:
-                                        break;
+                                        throw 'This is not a valid role ID nor @Mention!';
+                                    }
+                                    delete data.modules.leveling.rewards[message.args[3]];
+                                    await updateRole(message.args[4], {added: false, lvl: message.args[3]});
+                                    break;
+                                case "reset":
+                                case "clear":
+                                    embed.fields = null;
+                                    data.modules.leveling.rewards = {};
+                                    await updateConfig(`Cleared all role rewards for **${message.guild.name}**`, null);
+                                    break;
+                                default:
+                                    break;
                                 }
-                            }
                             break;
                         default:
                             break;
                     }
                     break;
                 case "responses":
-                    embed.description = '`enable \ disable`';
-                    embed.fields = null;
+                    embed.description = '`enable / disable` - toggles whole module'
+                    embed.fields[0].name = 'Current Setting';
+                    embed.fields[0].value = data.modules.responses.enabled?'Enabled':'Disabled';
                     if (message.args[1]) switch(message.args[1].toLowerCase()){
+                        case "enable":
+                            data.modules.responses.enabled = true;
+                            await updateConfig(`Responses module is now __enabled__.`, null);
+                            break;
+                        case "disable":
+                            data.modules.responses.enabled = false;
+                            await updateConfig(`Responses module is now __disabled__.`, null);
+                            break;
                         default:
                             break;
                     }
                     break;
                 case "autorole":
-                    embed.description = '`enable \ disable`';
+                    embed.description = '`enable / disable` - toggles whole module'
                     embed.fields = null;
                     if (message.args[1]) switch(message.args[1].toLowerCase()){
                         default:
                             break;
                     }
                     break;
-                    case "logging":
-                        embed.description = '`enable \ disable`';
-                    embed.fields = null;
+                case "logging":
+                    embed.description = '`enable / disable` - toggles whole module'
+                    +'\n`joinleave` - sets new log channel for join/leave and ban/unban events'
+                    +'\n`message` - sets new log channel for message edits/deletions'
+                    embed.fields[0].name = 'Currently configured log channels';
+                    embed.fields[0].value = `Join / Leave log channel${data.modules.logging.joinleave?`: <#${data.modules.logging.joinleave}> (${data.modules.logging.joinleave})`:' is not configured.'}`
+                    +`\nMessage log channel${data.modules.logging.message?`: <#${data.modules.logging.message}> (${data.modules.logging.message})`:' is not configured.'}`;
                     if (message.args[1]) switch(message.args[1].toLowerCase()){
+                        case "joinleave":
+                            if (message.args[2]){
+                                embed.fields = null;
+                                switch(message.args[2].toLowerCase()){
+                                    default:
+                                        break;
+                                }
+                            }
+                            break;
+                        case "message":
+                                if (message.args[2]){
+                                    embed.fields = null;
+                                    switch(message.args[2].toLowerCase()){
+                                        default:
+                                            break;
+                                    }
+                                }
+                            break;
                         default:
                             break;
                     }
