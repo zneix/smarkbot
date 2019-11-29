@@ -46,6 +46,22 @@ client.utils.delete = async function(collectionName, filter){
 	return await client.db().collection(collectionName).deleteMany(filter);
 }
 
+//leveling utils
+client.lvl = {};
+//getting user level info
+client.lvl.findUser = async function(guildid, userid){
+	return await client.db('smarkleveling').collection(guildid).find({userid: userid}).toArray();
+}
+//new user level info insertion
+client.lvl.newUser = async function(guildid, userid){
+	let template = {
+		userid: userid,
+		lvl: 0,
+		xp: 0
+	}
+	client.db('smarkleveling').collection(guildid).insertOne(template);
+}
+
 //new config template insertion
 client.utils.newGuildConfig = async function(guildid){
 	let template = {
