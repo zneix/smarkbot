@@ -8,7 +8,6 @@ exports.run = async (client, message) => {
     message.command(false, async () => {
         let data = (await client.db.utils.find('guilds', {guildid: message.guild.id}))[0];
         console.log(data.modules)
-        // console.log(data);
         let colors = {
             native: 0xda7678,
             success: 0x51d559
@@ -28,18 +27,19 @@ exports.run = async (client, message) => {
             +'\n`defaultrole` - manages default role (member role assigned to all members, e.g. @User)'
             +'\n`leveling` - manages leveling system'
             +'\n`responses` - enabled or diables reacting to messages'
-            +'\n`autorole` - manages system of automatic role assignment via command'
+            +'\n`roles` - manages system of automatic role assignment via command'
             +'\n`logging` - manages logging system',
+            // +'\n`resetall` - reverts all the config settings to default ones',
             fields: [
                 {
                     name: 'current brief config',
                     value:
                     `prefix - ${data.customprefix?data.customprefix:(`${client.config.prefix} (default)`)}`
                     +`\ndefaultrole - ${data.defaultrole?`<@&${data.defaultrole}> (${data.defaultrole})`:'none'}`
-                    +`\nleveling - ${data.modules.leveling.enabled?'enabled':'disabled'}, ${Object.getOwnPropertyNames(data.modules.leveling.rewards).length} rewards; level-ups: ${data.modules.leveling.announcetype}`
-                    +`\nresponses - ${data.modules.responses.enabled?'enabled':'disabled'}`
-                    +`\nautorole - ${data.modules.roles.enabled?'enabled':'disabled'}, ${Object.getOwnPropertyNames(data.modules.roles.units).length} configured roles`
-                    +`\nlogging - ${data.modules.logging.enabled?'enabled':'disabled'}, join/leave: ${data.modules.logging.joinleave?`<#${data.modules.logging.joinleave}>`:'none'}, message: ${data.modules.logging.message?`<#${data.modules.logging.message}>`:'none'}`
+                    +`\nleveling - ${data.modules.leveling.enabled?'**enabled**':'disabled'}, ${Object.getOwnPropertyNames(data.modules.leveling.rewards).length} rewards; level-ups: ${data.modules.leveling.announcetype}`
+                    +`\nresponses - ${data.modules.responses.enabled?'**enabled**':'disabled'}`
+                    +`\nroles - ${data.modules.roles.enabled?'**enabled**':'disabled'}, ${Object.getOwnPropertyNames(data.modules.roles.units).length} configured role(s)`
+                    +`\nlogging - ${data.modules.logging.enabled?'**enabled**':'disabled'}, join/leave: ${data.modules.logging.joinleave?`<#${data.modules.logging.joinleave}>`:'none'}, message: ${data.modules.logging.message?`<#${data.modules.logging.message}>`:'none'}`
                 }
             ]
         }
@@ -115,10 +115,12 @@ exports.run = async (client, message) => {
                     ];
                     if (message.args[1]) switch(message.args[1].toLowerCase()){
                         case "enable":
+                        case "true":
                             data.modules.leveling.enabled = true;
                             await updateConfig(`Leveling system is now __**enabled**__ in **${message.guild.name}**!`, null);
                             break;
                         case "disable":
+                        case "false":
                             data.modules.leveling.enabled = false;
                             await updateConfig(`Leveling system is now __**disabled**__ in **${message.guild.name}**!`, null);
                             break;
@@ -331,10 +333,12 @@ exports.run = async (client, message) => {
                     embed.fields[0].value = data.modules.responses.enabled?'Enabled':'Disabled';
                     if (message.args[1]) switch(message.args[1].toLowerCase()){
                         case "enable":
+                        case "true":
                             data.modules.responses.enabled = true;
                             await updateConfig(`Responses module is now __enabled__.`, null);
                             break;
                         case "disable":
+                        case "false":
                             data.modules.responses.enabled = false;
                             await updateConfig(`Responses module is now __disabled__.`, null);
                             break;
@@ -342,36 +346,53 @@ exports.run = async (client, message) => {
                             break;
                     }
                     break;
-                case "autorole":
+                case "roles":
                     embed.description = '`enable / disable` - toggles whole module'
                     +'\n`add <name> <roleID_or_@Role>` - adds a new role to module'
                     +'\n`remove <name>` - removes existing role from module'
-                    +'\n`clear - removes all roles from the module';
-                    embed.fields = null;
+                    +'\n`clear` - removes all roles from the module';
+                    embed.fields[0].name = 'Currently configured roles';
+                    let currRoles = '';
+                    if (Object.getOwnPropertyNames(data.modules.roles.units).length){
+                        for (i=0;i<Object.getOwnPropertyNames(data.modules.roles.units).length;i++){
+                            currRoles = currRoles.concat(`${Object.getOwnPropertyNames(data.modules.roles.units)[i]}: <@&${data.modules.roles.units[Object.getOwnPropertyNames(data.modules.roles.units)[i]]}>\n`);
+                        }
+                    }
+                    else currRoles = 'No configured roles.';
+                    currRoles = ('Module is '+(data.modules.roles.enabled?'**enabled**':'disabled'))+'\n'+currRoles;
+                    embed.fields[0].value = currRoles;
                     if (message.args[1]) switch(message.args[1].toLowerCase()){
                         case "enable":
                         case "true":
-                            data.modules.autorole.enabled = true;
-                            await updateConfig(`Autorole module is now __enabled__`, null);
+                            data.modules.roles.enabled = true;
+                            await updateConfig(`Roles module is now __enabled__`, null);
                             break;
                         case "disable":
                         case "false":
-                            data.modules.autorole.enabled = false;
-                            await updateConfig(`Autorole module is now __disabled__`, null);
+                            data.modules.roles.enabled = false;
+                            await updateConfig(`Roles module is now __disabled__`, null);
                             break;
                         case "add":
                             if (!message.guild.me.hasPermission('MANAGE_ROLES')) throw "I don't have **MANAGE_ROLES** permission here, so I can't use role assignment feature!";
-                            if (!message.args[2] || !message.args[3]) throw 'You need to specify **name for assignment** and **role ID/@Mention**';
+                            if (!message.args[2] || !message.args[3]) throw 'You must specify **name for assignment** and **role ID/@Mention**';
                             if (!message.guild.roles.has(message.args[3])){
                                 if (message.mentions.roles.size && message.args[3].includes(message.mentions.roles.first().id)){
-                                    //success with message.mentions.roles.first().id
+                                    data.modules.roles.units[message.args[2]] = message.mentions.roles.first().id;
+                                    roleCheck(message.mentions.roles.first().id);
+                                    await updateConfig(`Successfully added role ${message.mentions.roles.first()} to autoassignment module with name \`${message.args[2]}\``, null);
                                     break;
                                 }
                                 throw 'This is not a valid role ID nor @Mention!';
                             }
-                            //success with message.args[3]
+                            data.modules.roles.units[message.args[2]] = message.args[3];
+                            roleCheck(message.args[3]);
+                            await updateConfig(`Successfully added role <@&${message.args[3]}> to autoassignment module with name \`${message.args[2]}\``, null);
                             break;
                         case "remove":
+                            if (!message.args[2]) throw "You must specify the **role assignment name**";
+                            if (!data.modules.roles.units[message.args[2]]) throw "That role doesn't exist in autoassignment module";
+                            delete data.modules.roles.units[message.args[2]];
+                            await updateConfig(`Removed role associated with name \`${message.args[2]}\` from autoassignment module`, null);
                             break;
                         case "clear":
                             data.modules.roles.units = {};
@@ -386,31 +407,102 @@ exports.run = async (client, message) => {
                     +'\n`joinleave` - sets new log channel for join/leave and ban/unban events'
                     +'\n`message` - sets new log channel for message edits/deletions'
                     embed.fields[0].name = 'Currently configured log channels';
-                    embed.fields[0].value = `Join / Leave log channel${data.modules.logging.joinleave?`: <#${data.modules.logging.joinleave}> (${data.modules.logging.joinleave})`:' is not configured.'}`
-                    +`\nMessage log channel${data.modules.logging.message?`: <#${data.modules.logging.message}> (${data.modules.logging.message})`:' is not configured.'}`;
+                    embed.fields[0].value = (data.modules.logging.enabled?'**Enabled**':'Disabled')
+                    +`\nJoin / Leave log channel: ${data.modules.logging.joinleave?`<#${data.modules.logging.joinleave}> (${data.modules.logging.joinleave})`:' null'}`
+                    +`\nMessage log channel: ${data.modules.logging.message?`<#${data.modules.logging.message}> (${data.modules.logging.message})`:' null'}`;
                     if (message.args[1]) switch(message.args[1].toLowerCase()){
+                        case "enable":
+                        case "true":
+                            data.modules.logging.enabled = true;
+                            await updateConfig('Logging module is now __enabled__', null);
+                            break;
+                        case "disable":
+                        case "false":
+                            data.modules.logging.enabled = false;
+                            await updateConfig('Logging module is now __disabled__', null);
+                            break;
                         case "joinleave":
+                            embed.description = '`set <channelID_or_#Channel>` - sets new Join/leave channel'
+                            +'\n`clear` - deletes Join/leave logging channel';
+                            embed.fields[0].name = 'Current setting';
+                            embed.fields[0].value = (data.modules.logging.joinleave?`<#${data.modules.logging.joinleave}>`:'null');
                             if (message.args[2]){
-                                embed.fields = null;
                                 switch(message.args[2].toLowerCase()){
+                                    case "set":
+                                        if (!message.args[3]) throw 'You must specify Join/leave log channel to set!';
+                                        if (!message.guild.channels.get(message.args[3])){
+                                            if (message.mentions.channels.size){
+                                                if (message.guild.channels.has(message.mentions.channels.first().id)){
+                                                    if (message.mentions.channels.first().type !== 'text') throw 'This is not a text channel!';
+                                                    data.modules.logging.joinleave = message.mentions.channels.first().id;
+                                                    await updateConfig(`<#${message.mentions.channels.first().id}> is now Join/leave log channel`, null);
+                                                    break;
+                                                }
+                                            }
+                                            throw 'Mentioned channel is not a part of current server!';
+                                        }
+                                        else {
+                                            if (message.guild.channels.get(message.args[3]).type !== 'text') throw 'This is not a text channel!';
+                                            data.modules.logging.joinleave = message.args[3];
+                                            await updateConfig(`<#${message.args[3]}> is now Join/leave log channel`, null);
+                                        }
+                                        break;
+                                    case "clear":
+                                        data.modules.logging.joinleave = null;
+                                        await updateConfig(`Deleted Join/leave channel from config`, null);
+                                        break;
                                     default:
                                         break;
                                 }
                             }
                             break;
                         case "message":
-                                if (message.args[2]){
-                                    embed.fields = null;
-                                    switch(message.args[2].toLowerCase()){
-                                        default:
-                                            break;
-                                    }
+                            embed.description = '`set <channelID_or_#Channel>` - sets new message channel'
+                            +'\n`clear` - deletes message logging channel';
+                            embed.fields[0].name = 'Current setting';
+                            embed.fields[0].value = data.modules.logging.message?`<#${data.modules.logging.message}>`:'null';
+                            if (message.args[2]){
+                                switch(message.args[2].toLowerCase()){
+                                    case "set":
+                                        if (!message.args[3]) throw 'You must specify message log channel to set!';
+                                        if (!message.guild.channels.get(message.args[3])){
+                                            if (message.mentions.channels.size){
+                                                if (message.guild.channels.has(message.mentions.channels.first().id)){
+                                                    if (message.mentions.channels.first().type !== 'text') throw 'This is not a text channel!';
+                                                    data.modules.logging.message = message.mentions.channels.first().id;
+                                                    await updateConfig(`<#${message.mentions.channels.first().id}> is now message log channel`, null);
+                                                    break;
+                                                }
+                                            }
+                                            throw 'Mentioned channel is not a part of current server!';
+                                        }
+                                        else {
+                                            if (message.guild.channels.get(message.args[3]).type !== 'text') throw 'This is not a text channel!';
+                                            data.modules.logging.message = message.args[3];
+                                            await updateConfig(`<#${message.args[3]}> is now message log channel`, null);
+                                        }
+                                        break;
+                                    case "clear":
+                                        data.modules.logging.message = null;
+                                        await updateConfig(`Deleted message channel from config`, null);
+                                        break;
+                                    default:
+                                        break;
                                 }
+                            }
                             break;
                         default:
                             break;
                     }
                     break;
+                // case "resetall":
+                //     await client.db.utils.delete('guilds', message.guild.id);
+                //     await client.db.utils.newGuildConfig(message.guild.id);
+                //     embed.color = colors.success;
+                //     embed.author.name = 'Success!';
+                //     embed.description = 'Reverted all config settings to defaults';
+                //     embed.fields = null;
+                //     break;
                 default:
                     break;
             }
