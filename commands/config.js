@@ -57,7 +57,7 @@ exports.run = async (client, message) => {
                 ];
                 if (message.args[1]) switch(message.args[1].toLowerCase()){
                     case "set":
-                        if (!message.args[2]) throw 'You must specify the new config name!';
+                        if (!message.args[2]) throw 'You must specify the new prefix!';
                         data.customprefix = message.args[2].toLowerCase();
                         await updateConfig(`Successfully updated custom prefix for **${message.guild.name}** to \`${data.customprefix}\``);
                         break;
@@ -344,8 +344,39 @@ exports.run = async (client, message) => {
                     break;
                 case "autorole":
                     embed.description = '`enable / disable` - toggles whole module'
+                    +'\n`add <name> <roleID_or_@Role>` - adds a new role to module'
+                    +'\n`remove <name>` - removes existing role from module'
+                    +'\n`clear - removes all roles from the module';
                     embed.fields = null;
                     if (message.args[1]) switch(message.args[1].toLowerCase()){
+                        case "enable":
+                        case "true":
+                            data.modules.autorole.enabled = true;
+                            await updateConfig(`Autorole module is now __enabled__`, null);
+                            break;
+                        case "disable":
+                        case "false":
+                            data.modules.autorole.enabled = false;
+                            await updateConfig(`Autorole module is now __disabled__`, null);
+                            break;
+                        case "add":
+                            if (!message.guild.me.hasPermission('MANAGE_ROLES')) throw "I don't have **MANAGE_ROLES** permission here, so I can't use role assignment feature!";
+                            if (!message.args[2] || !message.args[3]) throw 'You need to specify **name for assignment** and **role ID/@Mention**';
+                            if (!message.guild.roles.has(message.args[3])){
+                                if (message.mentions.roles.size && message.args[3].includes(message.mentions.roles.first().id)){
+                                    //success with message.mentions.roles.first().id
+                                    break;
+                                }
+                                throw 'This is not a valid role ID nor @Mention!';
+                            }
+                            //success with message.args[3]
+                            break;
+                        case "remove":
+                            break;
+                        case "clear":
+                            data.modules.roles.units = {};
+                            await updateConfig(`All roles has been excluded from autoassigning`, null);
+                            break;
                         default:
                             break;
                     }

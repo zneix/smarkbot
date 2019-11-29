@@ -52,6 +52,8 @@ client.utils.newGuildConfig = async function(guildid){
 		guildid: guildid,
 		customprefix: null,
 		defaultrole: null,
+		modrole: null,
+		adminrole: null,
 		modules: {
 			leveling: {
 				enabled: false,
