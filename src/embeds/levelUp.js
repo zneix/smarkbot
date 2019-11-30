@@ -1,4 +1,4 @@
-module.exports = (message, lvl) => {
+module.exports = (message, destination, lvl) => {
     var embed = {
         color: 0x8ed938,
         timestamp: new Date(),
@@ -8,11 +8,11 @@ module.exports = (message, lvl) => {
         },
         fields: [
             {
-                name: `Level up!`,
+                name: 'Level up!',
                 value: `${message.author} just achieved level ${lvl}!`
             }
         ]
     }
-    message.channel.send({embed:embed}),
-    console.log(`{level-up} '${message.author.tag}' achieved level ${lvl}!`)
+    destination.send({embed:embed});
+    console.log(`{level-up} '${message.author.tag}' achieved level ${lvl}!`);
 }

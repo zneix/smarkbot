@@ -57,40 +57,56 @@ module.exports = async (client, message) => {
             if (dbconfig.modules.leveling.enabled === false) return;
             if (dbconfig.modules.leveling.blacklist.includes(message.channel.id) || client.config.modules.leveling.blocked.includes(message.author.id)) return; //bl channels, bl users
             if (client.tr.has(message.author.id)) return; //cooldowned users
-            return; //this will be redone later to MongoDB
+            // return; //this will be redone later to MongoDB
 
             //cooldown thingy
             client.tr.add(message.author.id);
-            setTimeout(function() {client.tr.delete(message.author.id)}, 60000);
+            setTimeout(function(){client.tr.delete(message.author.id)}, 60000);
 
+            //fetching (or adding new) user profile from database
             let userLvl = await client.db.lvl.findUser(message.guild.id, message.author.id);
             if (!userLvl) await client.db.lvl.newUser(message.guild.id, message.author.id);
 
+            //rng 15-25
             let random = Math.floor(15 + Math.random()*11);
+
+            //summary XP needed for next level
             let sum = 0;
-            let i = 0;
-            do {
-                sum = sum + (5 * Math.pow(i, 2) + 50 * i + 100);
-                i++;
-            } while (i < userLvl["lvl"]+1);
+            for (i=0;i<userLvl["lvl"]+1;i++){
+                sum += (5 * Math.pow(i, 2) + 50 * i + 100);
+            }
+            
             //finish here...
             if ((userLvl["xp"]+random) > sum) {
                 //level up
-                if (client.config.modules.leveling.rewards[rows[0]["lvl"]+1]) {
+                if (dbconfig.modules.leveling.rewards[userLvl["lvl"]+1]) {
                     //level up with role reward
-                    let rewardRole = message.guild.roles.get(client.config.modules.leveling.rewards[`${rows[0]["lvl"]+1}`]);
-                    if (rewardRole) message.member.addRole(rewardRole);
-                    let deletRole = message.guild.roles.get(client.config.modules.leveling.rewards[`${rows[0]["lvl"]+1-4}`]);
-                    if (deletRole) message.member.removeRole(deletRole);
+                    let rewardRole = message.guild.roles.get(dbconfig.modules.leveling.rewards[`${userLvl["lvl"]+1}`]);
+                    if (message.guild.me.hasPermission('MANAGE_ROLES') && (rewardRole?(rewardRole.calculatedPosition < message.guild.me.highestRole.calculatedPosition):false)) message.member.addRole(rewardRole);
                 }
                 //regular level up
-                await conn.query(`UPDATE \`smarkbot_levels\` SET xp = ${rows[0]["xp"]+random}, lvl = ${rows[0]["lvl"]+1} WHERE uid = ${message.author.id}`);
-                require(`../src/embeds/levelUp`)(message, rows[0]["lvl"]+1); //annoucment and log
-                return conn.destroy();
+                await client.db.lvl.updateUser(message.guild.id, userLvl);
+                //level up annoucment
+                switch(dbconfig.modules.leveling.announcetype){
+                    case "embed":
+                        require(`../src/embeds/levelUp`)(message, message.channel, userLvl["lvl"]+1);
+                        break;
+                    case "react":
+                        let nextlvl = userLvl["lvl"]+1;
+                        let intEmotes = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣'];
+                        await message.react('🎉');
+                        for (i=0;i<nextlvl.toString().length;i++) await message.react(intEmotes[nextlvl]);
+                        break;
+                    case "dm":
+                        require(`../src/embeds/levelUp`)(message, message.author, userLvl["lvl"]+1);
+                        break;
+                    case "none":
+                        break;
+                }
             }
             //regular xp add
-            else await conn.query(`UPDATE \`smarkbot_levels\` SET xp = ${rows[0]["xp"]+random} WHERE uid =${message.author.id}`);
-            return conn.destroy();
+            userLvl.xp += random;
+            await client.db.lvl.updateUser(message.guild.id, userLvl);
         }
     }
     catch (err) {
