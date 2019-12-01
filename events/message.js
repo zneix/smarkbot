@@ -51,57 +51,51 @@ module.exports = async (client, message) => {
             //message handling - levling system in action below
             //module: responses
             if (dbconfig.modules.responses.enabled) require('../src/functions/responseHandler')(message.content.toLowerCase(), message, client);
-            
+
             //module: leveling
             //escaping various conditions...
-            if (dbconfig.modules.leveling.enabled === false) return;
-            if (dbconfig.modules.leveling.blacklist.includes(message.channel.id) || client.config.modules.leveling.blocked.includes(message.author.id)) return; //bl channels, bl users
-            if (client.tr.has(message.author.id)) return; //cooldowned users
-            // return; //this will be redone later to MongoDB
-
+            if (!dbconfig.modules.leveling.enabled) return;
+            if (dbconfig.modules.leveling.blacklist.includes(message.channel.id) || dbconfig.modules.leveling.blocked.includes(message.author.id)) return;
+            if (client.tr.has(message.author.id)) return;
             //cooldown thingy
             client.tr.add(message.author.id);
-            setTimeout(function(){client.tr.delete(message.author.id)}, 60000);
-
+            setTimeout(function(){client.tr.delete(message.author.id)}, 300);
             //fetching (or adding new) user profile from database
-            let userLvl = await client.db.lvl.findUser(message.guild.id, message.author.id);
-            if (!userLvl) await client.db.lvl.newUser(message.guild.id, message.author.id);
-
+            let userLvl = (await client.db.lvl.findUser(message.guild.id, message.author.id))[0];
+            console.log(userLvl);
+            if (!userLvl) userLvl = (await client.db.lvl.newUser(message.guild.id, message.author.id))[0];
+            console.log(userLvl);
             //rng 15-25
             let random = Math.floor(15 + Math.random()*11);
-
             //summary XP needed for next level
             let sum = 0;
             for (i=0;i<userLvl["lvl"]+1;i++){
                 sum += (5 * Math.pow(i, 2) + 50 * i + 100);
             }
-            
-            //finish here...
+            //level up
             if ((userLvl["xp"]+random) > sum) {
-                //level up
-                if (dbconfig.modules.leveling.rewards[userLvl["lvl"]+1]) {
-                    //level up with role reward
-                    let rewardRole = message.guild.roles.get(dbconfig.modules.leveling.rewards[`${userLvl["lvl"]+1}`]);
-                    if (message.guild.me.hasPermission('MANAGE_ROLES') && (rewardRole?(rewardRole.calculatedPosition < message.guild.me.highestRole.calculatedPosition):false)) message.member.addRole(rewardRole);
-                }
-                //regular level up
+                userLvl["lvl"]++;
                 await client.db.lvl.updateUser(message.guild.id, userLvl);
                 //level up annoucment
                 switch(dbconfig.modules.leveling.announcetype){
                     case "embed":
-                        require(`../src/embeds/levelUp`)(message, message.channel, userLvl["lvl"]+1);
+                        require('../src/embeds/levelUp')(message, message.channel, userLvl["lvl"]);
                         break;
                     case "react":
-                        let nextlvl = userLvl["lvl"]+1;
                         let intEmotes = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣'];
                         await message.react('🎉');
-                        for (i=0;i<nextlvl.toString().length;i++) await message.react(intEmotes[nextlvl]);
+                        for (i=0;i<userLvl["lvl"].toString().length;i++) await message.react(intEmotes[nextlvl]);
                         break;
                     case "dm":
-                        require(`../src/embeds/levelUp`)(message, message.author, userLvl["lvl"]+1);
+                        require('../src/embeds/levelUp')(message, message.author, userLvl["lvl"]);
                         break;
                     case "none":
                         break;
+                }
+                //level up with role reward
+                if (dbconfig.modules.leveling.rewards[userLvl["lvl"]]) {
+                    let rewardRole = message.guild.roles.get(dbconfig.modules.leveling.rewards[`${userLvl["lvl"]}`]);
+                    if (message.guild.me.hasPermission('MANAGE_ROLES') && (rewardRole?(rewardRole.calculatedPosition < message.guild.me.highestRole.calculatedPosition):false)) message.member.addRole(rewardRole);
                 }
             }
             //regular xp add
