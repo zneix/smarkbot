@@ -8,9 +8,9 @@ exports.perms = 'user';
 exports.run = async (client, message) => {
     message.command(false, async () => {
         //lidl command cooldown
-        if (client.lvlcd.has(message.author.id)) throw `You can only use that command once per **${cooldown/1000} seconds**!`;
-        client.lvlcd.add(message.author.id);
-        setTimeout(function(){client.lvlcd.delete(message.author.id)}, cooldown);
+        if (client.rank.has(message.author.id)) throw `You can only use that command once per **${cooldown/1000} seconds**!`;
+        client.rank.add(message.author.id);
+        setTimeout(function(){client.rank.delete(message.author.id)}, cooldown);
 
         //actual response
         let userLvl = (await client.db.lvl.findUser(message.guild.id, message.author.id))[0];

@@ -56,15 +56,14 @@ module.exports = async (client, message) => {
             //escaping various conditions...
             if (!dbconfig.modules.leveling.enabled) return;
             if (dbconfig.modules.leveling.blacklist.includes(message.channel.id) || dbconfig.modules.leveling.blocked.includes(message.author.id)) return;
-            if (client.tr.has(message.author.id)) return;
+            if (!client.tr[message.guild.id]) client.tr[message.guild.id] = new Set();
+            if (client.tr[message.guild.id].has(message.author.id)) return;
             //cooldown thingy
-            client.tr.add(message.author.id);
-            setTimeout(function(){client.tr.delete(message.author.id)}, 300);
+            client.tr[message.guild.id].add(message.author.id);
+            setTimeout(function(){client.tr[message.guild.id].delete(message.author.id)}, 60000);
             //fetching (or adding new) user profile from database
             let userLvl = (await client.db.lvl.findUser(message.guild.id, message.author.id))[0];
-            console.log(userLvl);
             if (!userLvl) userLvl = (await client.db.lvl.newUser(message.guild.id, message.author.id))[0];
-            console.log(userLvl);
             //rng 15-25
             let random = Math.floor(15 + Math.random()*11);
             //summary XP needed for next level

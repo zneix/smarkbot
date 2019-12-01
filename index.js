@@ -25,8 +25,8 @@ client.RC = require('reaction-core'); //module for ahndling reactions
 client.RCHandler = new client.RC.Handler; //reaction-core handler
 client.fs = fs; //global filesystem module
 client.schedule = schedule; //yet useless
-client.tr = new Set(); //set for talkedRecently (used by lidl leveling system)
-client.lvlcd = new Set(); //set for cooldowning level check command
+client.tr = {}; //object used to store sets of talkedRecently (used by lidl leveling system)
+client.rank = new Set(); //set for cooldowning level check command
 
 //handlers and global function exports
 require(`./src/functions/loadEvents`)(client); //event handler
