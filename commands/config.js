@@ -1,7 +1,7 @@
 exports.name = `{PREFIX}${__filename.split(/[\\/]/).pop().slice(0,-3)}`;
 exports.description = `Changes bot configuration for current server.`;
 exports.usage = `{PREFIX}${__filename.split(/[\\/]/).pop().slice(0,-3)}`;
-exports.perms = `owner`;
+exports.perms = 'admin';
 exports.home = false;
 
 exports.run = async (client, message) => {

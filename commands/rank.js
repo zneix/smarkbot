@@ -1,4 +1,4 @@
-let cooldown = 30000;
+let cooldown = 5000;
 exports.name = `{PREFIX}${__filename.split(/[\\/]/).pop().slice(0,-3)}`;
 exports.description = `Allows you to check your level progress (has ${cooldown/1000}s cooldown).`;
 exports.usage = `{PREFIX}${__filename.split(/[\\/]/).pop().slice(0,-3)}`;
@@ -13,8 +13,14 @@ exports.run = async (client, message) => {
         setTimeout(function(){client.rank.delete(message.author.id)}, cooldown);
 
         //actual response
-        let userLvl = (await client.db.lvl.findUser(message.guild.id, message.author.id))[0];
-        if (!userLvl) (await client.db.lvl.newUser(message.guild.id, message.author.id))[0];
-        require(`../src/embeds/rankCheck`)(message, userLvl);
+        if (message.args){
+            let userLvl = (await client.db.lvl.findUser(message.guild.id, message.args[0]))[0];
+            if (!userLvl) throw 'Command argument is not a valid user ID or @Mention';
+        }
+        else {
+            let userLvl = (await client.db.lvl.findUser(message.guild.id, message.author.id))[0];
+            if (!userLvl) (await client.db.lvl.newUser(message.guild.id, message.author.id))[0];
+            require(`../src/embeds/rankCheck`)(message, userLvl);
+        }
     });
 }
