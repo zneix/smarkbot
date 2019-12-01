@@ -57,12 +57,13 @@ client.lvl.updateUser = async function(guildid, doc){
 }
 //new user level info insertion
 client.lvl.newUser = async function(guildid, userid){
+	(await client.db('smarkleveling').listCollections().toArray()).some(x => x.name === guildid)?null:(await client.db('smarkleveling').createCollection(guildid));
 	let template = {
 		userid: userid,
 		lvl: 0,
 		xp: 0
 	}
-	client.db('smarkleveling').collection(guildid).insertOne(template);
+	return await client.db('smarkleveling').collection(guildid).insertOne(template);
 }
 
 //new config template insertion
