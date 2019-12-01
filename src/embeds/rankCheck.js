@@ -21,7 +21,7 @@ module.exports = (message, userLvl) => {
             icon_url: message.author.avatarURL
         },
         author: {
-            name: 'Level progress'
+            name: 'Level progress of '+(message.guild.member(userLvl.userid)?message.guild.member(userLvl.userid).user.tag:`${userLvl.userid} (user left)`)
         },
         fields: [
             {

@@ -63,7 +63,7 @@ client.lvl.newUser = async function(guildid, userid){
 		lvl: 0,
 		xp: 0
 	}
-	return await client.db('smarkleveling').collection(guildid).insertOne(template);
+	return (await client.db('smarkleveling').collection(guildid).insertOne(template)).ops[0];
 }
 
 //new config template insertion

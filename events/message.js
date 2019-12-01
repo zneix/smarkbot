@@ -7,6 +7,7 @@ module.exports = async (client, message) => {
         //defining prefix
         let guildprefix = dbconfig.customprefix===null?client.config.prefix:dbconfig.customprefix;
         //showing prefix on @Mention
+        guildprefix = '===';
         if (message.content.startsWith(client.user)) message.channel.send(`Hey ${message.author}, my prefix in this server is \`${guildprefix}\``);
         let prefix =  function(){return message.content.substr(0, guildprefix.length).toLowerCase();}
         if (prefix() === guildprefix) {
@@ -63,7 +64,7 @@ module.exports = async (client, message) => {
             setTimeout(function(){client.tr[message.guild.id].delete(message.author.id)}, 60000);
             //fetching (or adding new) user profile from database
             let userLvl = (await client.db.lvl.findUser(message.guild.id, message.author.id))[0];
-            if (!userLvl) userLvl = (await client.db.lvl.newUser(message.guild.id, message.author.id))[0];
+            if (!userLvl) userLvl = await client.db.lvl.newUser(message.guild.id, message.author.id);
             //rng 15-25
             let random = Math.floor(15 + Math.random()*11);
             //summary XP needed for next level

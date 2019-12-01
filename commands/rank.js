@@ -13,13 +13,25 @@ exports.run = async (client, message) => {
         setTimeout(function(){client.rank.delete(message.author.id)}, cooldown);
 
         //actual response
-        if (message.args){
+        if (message.args[0]){
+            if (message.mentions.members.size){
+                if (message.args[0].includes(message.mentions.members.first().id)){
+                    let userLvl = (await client.db.lvl.findUser(message.guild.id, message.mentions.members.first().id))[0];
+                    if (!userLvl) userLvl = await client.db.lvl.newUser(message.guild.id, message.mentions.members.first().id);
+                    return require(`../src/embeds/rankCheck`)(message, userLvl);
+                }
+                else throw 'Command argument is not a valid member ID or @Mention';
+            }
             let userLvl = (await client.db.lvl.findUser(message.guild.id, message.args[0]))[0];
-            if (!userLvl) throw 'Command argument is not a valid user ID or @Mention';
+            if (!userLvl) {
+                if (message.guild.member(message.args[0])) userLvl = await client.db.lvl.newUser(message.guild.id, message.args[0]);
+                else throw 'Command argument is not a valid member ID or @Mention';
+            }
+            require(`../src/embeds/rankCheck`)(message, userLvl);
         }
         else {
             let userLvl = (await client.db.lvl.findUser(message.guild.id, message.author.id))[0];
-            if (!userLvl) (await client.db.lvl.newUser(message.guild.id, message.author.id))[0];
+            if (!userLvl) userLvl = await client.db.lvl.newUser(message.guild.id, message.author.id);
             require(`../src/embeds/rankCheck`)(message, userLvl);
         }
     });
