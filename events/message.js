@@ -7,7 +7,6 @@ module.exports = async (client, message) => {
         //defining prefix
         let guildprefix = dbconfig.customprefix===null?client.config.prefix:dbconfig.customprefix;
         //showing prefix on @Mention
-        guildprefix = '===';
         if (message.content.startsWith(client.user)) message.channel.send(`Hey ${message.author}, my prefix in this server is \`${guildprefix}\``);
         let prefix =  function(){return message.content.substr(0, guildprefix.length).toLowerCase();}
         if (prefix() === guildprefix) {
