@@ -52,8 +52,8 @@ client.lvl = {};
 client.lvl.findUser = async function(guildid, userid){
 	return await client.db('smarkleveling').collection(guildid).find({userid: userid}).toArray();
 }
-client.lvl.updateUser = async function(guildid, doc){
-	return await client.db('smarkleveling').collection(guildid).findOneAndReplace({userid: doc.userid}, doc);
+client.lvl.updateUser = async function(guildid, D_OMEGALUL_C){
+	return await client.db('smarkleveling').collection(guildid).findOneAndReplace({userid: doc.userid}, D_OMEGALUL_C);
 }
 //new user level info insertion
 client.lvl.newUser = async function(guildid, userid){
