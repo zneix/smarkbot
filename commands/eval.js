@@ -12,7 +12,7 @@ exports.run = async (client, message) => {
           }
         try {
             let code = message.args.join(' ');
-            let evaled = eval(code);
+            let evaled = await eval(code);
 
             if (typeof evaled !== "string") evaled = require('util').inspect(evaled);
             message.channel.send(clean(evaled), {code:"xl"});
