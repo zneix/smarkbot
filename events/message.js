@@ -83,7 +83,7 @@ module.exports = async (client, message) => {
                     case "react":
                         let intEmotes = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣'];
                         await message.react('🎉');
-                        for (i=0;i<userLvl["lvl"].toString().length;i++) await message.react(intEmotes[nextlvl]);
+                        for (i=0;i<userLvl["lvl"].toString().length;i++) await message.react(intEmotes[userLvl["lvl"].toString().slice(i, i+1)]);
                         break;
                     case "dm":
                         require('../src/embeds/levelUp')(message, message.author, userLvl["lvl"]);
