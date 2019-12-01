@@ -7,7 +7,6 @@ exports.home = false;
 exports.run = async (client, message) => {
     message.command(false, async () => {
         let data = (await client.db.utils.find('guilds', {guildid: message.guild.id}))[0];
-        console.log(data.modules)
         let colors = {
             native: 0xda7678,
             success: 0x51d559
@@ -166,7 +165,7 @@ exports.run = async (client, message) => {
                                         if (message.guild.channels.has(message.mentions.channels.first().id) && message.args[3].includes(message.mentions.channels.first().id)){
                                             //success from mention
                                             data.modules.leveling.blacklist.push(message.mentions.channels.first().id);
-                                            await updateConfig(`Channel <#${message.mentions.channels.first().id}> (${message.mentions.channels.first().id}) has been added to blacklist.`, null);
+                                            await updateConfig(`Channel <#${message.mentions.channels.first().id}> (${message.mentions.channels.first().id}) has been __added__ to blacklist.`, null);
                                             break;
                                         }
                                         throw 'Mentioned channel is not a part of current server!';
@@ -174,16 +173,16 @@ exports.run = async (client, message) => {
                                     if (!message.guild.channels.has(message.args[3])) throw "Channel with given ID is not a part of current server!";
                                     //success from ID
                                     data.modules.leveling.blacklist.push(message.args[3]);
-                                    await updateConfig(`Channel <#${message.args[3]}> (${message.args[3]}) has been added to blacklist.`, null);
+                                    await updateConfig(`Channel <#${message.args[3]}> (${message.args[3]}) has been __added__ to blacklist.`, null);
                                     break;
                                 case "remove":
                                     if (!message.args[3]) throw 'You must specify Channel ID or mention it via #Channel';
                                     if (message.mentions.channels.size) {
-                                        if (message.guild.channels.has(message.mentions.channels.size.first().id) && message.args[3].includes(message.mentions.channels.size.first().id)){
+                                        if (message.guild.channels.has(message.mentions.channels.first().id) && message.args[3].includes(message.mentions.channels.first().id)){
                                             //success from mention
-                                            let index = data.modules.leveling.blacklist.indexOf(message.mentions.channels.size.first().id);
+                                            let index = data.modules.leveling.blacklist.indexOf(message.mentions.channels.first().id);
                                             if (index > -1) data.modules.leveling.blacklist.splice(index, 1);
-                                            await updateConfig(`Channel <#${message.mentions.channels.size.first().id}> (${message.mentions.channels.size.first().id}) has been added to blacklist.`, null);
+                                            await updateConfig(`Channel <#${message.mentions.channels.first().id}> (${message.mentions.channels.first().id}) has been __removed__ from blacklist.`, null);
                                             break;
                                         }
                                         throw 'Mentioned channel is not a part of current server!';
@@ -192,7 +191,7 @@ exports.run = async (client, message) => {
                                     //success from ID
                                     let index = data.modules.leveling.blacklist.indexOf(message.args[3]);
                                     if (index > -1) data.modules.leveling.blacklist.splice(index, 1);
-                                    await updateConfig(`Channel <#${message.args[3]}> (${message.args[3]}) has been added to blacklist.`, null);
+                                    await updateConfig(`Channel <#${message.args[3]}> (${message.args[3]}) has been __removed__ from blacklist.`, null);
                                     break;
                                 case "reset":
                                 case "clear":

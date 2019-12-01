@@ -7,7 +7,7 @@ exports.home = true
 exports.run = async (client, message) => {
     message.command(1, async () => {
         //code...
-        if (!message.guild.member(message.author).hasPermission('MANAGE_ROLES')) throw `You're missing permissions!`
+        if (!message.member.hasPermission('MANAGE_ROLES')) throw `You're missing permissions!`
         const taggedUser = message.mentions.users.first();
         const role = message.guild.roles.get(client.config.roles.member);
         if (!role) return require(`../src/embeds/verificationProblem`)(client, message, `⚠ Role missing! ⚠`, `The role with an ID ${client.config.roles.member} does not exists!\n**Contact admins or zneix immediately!\nTHIS CODE SHOULD NEVER EXECUTE !!!!!!1!!11!111!!!!!!11!!**`);

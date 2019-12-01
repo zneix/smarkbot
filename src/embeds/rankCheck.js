@@ -1,20 +1,16 @@
-module.exports = (message, xp, lvl) => {
+module.exports = (message, userLvl) => {
     function reqXP(){
         let sum = 0;
-        let i = 0;
-        do {
-            sum = sum + (5 * Math.pow(i, 2) + 50 * i + 100);
-            i++;
-        } while (i < lvl+1);
+        for (i=0;i<userLvl["lvl"]+1;i++){
+            sum += (5 * Math.pow(i, 2) + 50 * i + 100);
+        }
         return sum;
     }
     function actualXP(){
         let sum = 0;
-        let i = 0;
-        do {
-            sum = sum + (5 * Math.pow(i, 2) + 50 * i + 100);
-            i++;
-        } while (i < lvl);
+        for (i=0;i<userLvl["lvl"];i++){
+            sum += (5 * Math.pow(i, 2) + 50 * i + 100);
+        }
         return sum;
     }
     var embed = {
@@ -25,21 +21,21 @@ module.exports = (message, xp, lvl) => {
             icon_url: message.author.avatarURL
         },
         author: {
-            name: "Level progress"
+            name: 'Level progress'
         },
         fields: [
             {
-                name: "Level",
-                value: lvl,
+                name: 'Level',
+                value: userLvl["lvl"],
                 inline: true
             },
             {
-                name: "Experience",
-                value: xp-actualXP()+"/"+(reqXP()-actualXP())+` (total: ${xp})`,
+                name: 'Experience',
+                value: userLvl["xp"]-actualXP()+"/"+(reqXP()-actualXP())+` (total: ${userLvl["xp"]})`,
                 inline: true
             }
         ]
     }
-    if (lvl = 0) embed.fields[1].value = xp+"/"+(reqXP()-actualXP())+` (total: ${xp})`
+    if (userLvl["lvl"] === 0) embed.fields[1].value = userLvl["xp"]+"/"+(reqXP()-actualXP())+` (total: ${userLvl["xp"]})`;
     message.channel.send({embed:embed});
 }
