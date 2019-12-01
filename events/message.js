@@ -103,23 +103,25 @@ module.exports = async (client, message) => {
         }
     }
     catch (err) {
-        if (typeof err !== "string") err.stack = err;
+        // if (typeof err !== "string") err.stack = err;
         console.log(err);
-        var embed = {
-            color: 0xff5050,
-            author: {
-                name:message.channel.guild.name+" — \""+message.channel.name+"\"",
-                icon_url: message.author.avatarURL
-            },
-            description: `There was an error in the message event:`,
-            fields:[
-                {
-                    name: "Reason:",
-                    value: err.substring(0,1023),
-                }
-            ],
-            timestamp: new Date()
-        }
-        message.channel.send({embed:embed}).then(msg => {if (client.config.delete.error) msg.delete(client.config.delete.time);});
+        console.log('\n');
+        console.log(err.toString());
+        // var embed = {
+        //     color: 0xff5050,
+        //     author: {
+        //         name:message.channel.guild.name+" — \""+message.channel.name+"\"",
+        //         icon_url: message.author.avatarURL
+        //     },
+        //     description: `There was an error in the message event:`,
+        //     fields:[
+        //         {
+        //             name: "Reason:",
+        //             value: err.toString().substring(0,1023),
+        //         }
+        //     ],
+        //     timestamp: new Date()
+        // }
+        // message.channel.send({embed:embed}).then(msg => {if (client.config.delete.error) msg.delete(client.config.delete.time);});
     }
 }
