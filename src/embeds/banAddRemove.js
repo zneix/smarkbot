@@ -12,7 +12,7 @@ module.exports = (client, user, channel, bool) => {
     let date = user.createdAt;
     let formattedDate = leadingZeroes(date.getDate())+'/'+leadingZeroes(date.getMonth()+1)+'/'+date.getFullYear()+', '+leadingZeroes(date.getHours())+':'+leadingZeroes(date.getMinutes())+':'+leadingZeroes(date.getSeconds());
     var embed = {
-        color: parseInt(`0x${bool?"ff5b42":"5bff42"}`), // Ban || Unban
+        color: (bool?0xff5b42:0x5bff42), // Ban || Unban
         timestamp: Date.now(),
         thumbnail: user.avatarURL,
         footer: {
