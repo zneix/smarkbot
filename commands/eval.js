@@ -1,5 +1,4 @@
 exports.name = `{PREFIX}${__filename.split(/[\\/]/).pop().slice(0,-3)}`;
-exports.home = false
 exports.description = 'Executes provided code.';
 exports.usage = `{PREFIX}${__filename.split(/[\\/]/).pop().slice(0,-3)} [code]`;
 exports.perms = 'owner';

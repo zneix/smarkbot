@@ -1,6 +1,5 @@
 exports.name = `{PREFIX}${__filename.split(/[\\/]/).pop().slice(0,-3)}`;
 exports.description = `Pings a bot to check if it's online.`;
-exports.home = false
 exports.usage = `**{PREFIX}${__filename.split(/[\\/]/).pop().slice(0,-3)}**`;
 exports.perms = 'user';
 

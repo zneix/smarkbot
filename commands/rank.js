@@ -3,7 +3,6 @@ exports.name = `{PREFIX}${__filename.split(/[\\/]/).pop().slice(0,-3)}`;
 exports.description = `Allows you to check your level progress (has ${cooldown/1000}s cooldown).`;
 exports.usage = `{PREFIX}${__filename.split(/[\\/]/).pop().slice(0,-3)}`;
 exports.perms = 'user';
-// exports.home = true;
 
 exports.run = async (client, message) => {
     message.command(false, async () => {
