@@ -4,7 +4,7 @@ const enmap = require('enmap'); //enmap object for command handler
 const fs = require('fs'); //filesystem module
 const schedule = require('node-schedule'); //yet useless
 require('npm-package-to-env').config(); //importing version value from package.json
-require(`./extensions/errorHandler`); //handling thrown errors
+require('./extensions/errorHandler'); //handling thrown errors
 
 var Promise = require('bluebird'); //module for error handler and rejections while using fs.writeFile
 Promise.config({longStackTraces:true}); //enabling long stack trees
@@ -29,8 +29,8 @@ client.tr = {}; //object used to store sets of talkedRecently (used by lidl leve
 client.rank = new Set(); //set for cooldowning level check command
 
 //handlers and global function exports
-require(`./src/functions/loadEvents`)(client); //event handler
-require(`./src/functions/loadCommands`)(client); //command handler
+require('./src/functions/loadEvents')(client); //event handler
+require('./src/functions/loadCommands')(client); //command handler
 
 //Discord authentication
 client.db = require('./src/functions/mongodb');

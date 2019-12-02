@@ -14,13 +14,13 @@ module.exports = (client, message, channel) => {
             icon_url: user?user.avatarURL:null
         },
         author: {
-            name: `Message Deleted`,
+            name: 'Message Deleted',
             icon_url: user?user.avatarURL:''
         },
-        description: `${user?user:'unknown#0000'} in ${message.channel} ${user?` (after ${formattedMs(Date.now() - message.createdTimestamp)})`:""}`,
+        description: `${user?user:'unknown#0000'} in ${message.channel} ${user?` (after ${formattedMs(Date.now() - message.createdTimestamp)})`:''}`,
         fields: [
             {
-                name: "Deleted Message",
+                name: 'Deleted Message',
                 value: user?message.content?message.content:'null':"unknown, message wasn't cached before event emit"
             }
         ]

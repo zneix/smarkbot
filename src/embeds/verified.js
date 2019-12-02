@@ -8,7 +8,7 @@ module.exports = (client, message, mod, newcomer) => {
         },
         fields: [
             {
-                name: `Successfully verified!`,
+                name: 'Successfully verified!',
                 value: `${mod} verified ${newcomer}.`
             }
         ]

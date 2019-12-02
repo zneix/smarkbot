@@ -14,17 +14,17 @@ module.exports = (client, oldMessage, newMessage, channel) => {
             icon_url: user.avatarURL
         },
         author: {
-            name: `Message Edited`,
+            name: 'Message Edited',
             icon_url: user.avatarURL
         },
         description: `${newMessage.author} in ${newMessage.channel} (after ${formattedMs(newMessage.editedTimestamp - (oldMessage.channel ? oldMessage.createdTimestamp : Date.parse(oldMessage.timestamp)) )})`,
         fields: [
             {
-                name: "Previous Message",
+                name: 'Previous Message',
                 value: oldMessage.channel?oldMessage.content?oldMessage.content:'null':"unknown, message wasn't cached before event emit"
             },
             {
-                name: "New Message",
+                name: 'New Message',
                 value: newMessage.content?newMessage.content:'null'
             }
 

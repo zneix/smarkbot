@@ -5,8 +5,8 @@ module.exports = (client, guild, user) => {
     let logs = client.channels.get(client.config.channels.logs);
     let verLogs = client.channels.get(client.config.channels.verLogs);
     
-    if (logs) require(`../src/embeds/banAddRemove`)(client, user, logs, true);
-    if (verLogs) require(`../src/embeds/banAddRemove`)(client, user, verLogs, true);
+    if (logs) require('../src/embeds/banAddRemove')(client, user, logs, true);
+    if (verLogs) require('../src/embeds/banAddRemove')(client, user, verLogs, true);
     
     if (!logs) return console.log(`{ERROR} [guildBanAdd] Channel with an ID ${client.config.channels.logs} does not exist in client.channels collaction!`);
     if (!verLogs) return console.log(`{ERROR} [guildBanAdd] Channel with an ID ${client.config.channels.verLogs} does not exist in client.channels collaction!`);

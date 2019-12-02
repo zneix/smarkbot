@@ -24,13 +24,13 @@ module.exports = (client, member) => {
             icon_url: member.user.avatarURL
         },
         author: {
-            name: `Member Joined`,
+            name: 'Member Joined',
             icon_url: member.user.avatarURL
         },
         description: `${member.user} ${member.user.tag}\nReact to **verify/reject** member`,
         fields: [
             {
-                name: `Account Created:`,
+                name: 'Account Created:',
                 value: `**${formattedDate}** (\`${formattedMs(Date.now() - member.user.createdTimestamp)}\` ago)`
             }
         ]

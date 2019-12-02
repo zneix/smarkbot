@@ -1,6 +1,6 @@
 module.exports = (client, user, channel, bool) => {
     function leadingZeroes(n){
-        if (n<=9) return "0"+n;
+        if (n<=9) return '0'+n;
         return n;
     }
     function formattedMs(n){
@@ -10,7 +10,7 @@ module.exports = (client, user, channel, bool) => {
         return `${Math.floor(n/86400000)}d ${Math.floor(n/3600000)-(Math.floor(n/86400000)*24)}h`;
     }
     let date = user.createdAt;
-    let formattedDate = leadingZeroes(date.getDate())+"/"+leadingZeroes(date.getMonth()+1)+"/"+date.getFullYear()+", "+leadingZeroes(date.getHours())+":"+leadingZeroes(date.getMinutes())+":"+leadingZeroes(date.getSeconds());
+    let formattedDate = leadingZeroes(date.getDate())+'/'+leadingZeroes(date.getMonth()+1)+'/'+date.getFullYear()+', '+leadingZeroes(date.getHours())+':'+leadingZeroes(date.getMinutes())+':'+leadingZeroes(date.getSeconds());
     var embed = {
         color: parseInt(`0x${bool?"ff5b42":"5bff42"}`), // Ban || Unban
         timestamp: Date.now(),
@@ -20,13 +20,13 @@ module.exports = (client, user, channel, bool) => {
             icon_url: user.avatarURL
         },
         author: {
-            name: `Member ${bool?"Banned":"Unbanned"}`,
+            name: `Member ${bool?'Banned':'Unbanned'}`,
             icon_url: user.avatarURL
         },
         description: `${user} ${user.tag}`,
         fields: [
             {
-                name: `Account Created:`,
+                name: 'Account Created:',
                 value: `**${formattedDate}** (\`${formattedMs(Date.now() - user.createdTimestamp)}\` ago)`
             }
         ]
