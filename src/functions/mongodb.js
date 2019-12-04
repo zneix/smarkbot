@@ -65,6 +65,12 @@ client.lvl.newUser = async function(guildid, userid){
 	}
 	return (await client.db('smarkleveling').collection(guildid).insertOne(template)).ops[0];
 }
+//getting user positions and doc count for rank.js command
+client.lvl.getRanking = async function(guildid, userid){
+	let all = await client.db('smarkleveling').collection(guildid).countDocuments();
+	let userArr = (await client.db('smarkleveling').collection(guildid).find({}, {projection: {userid: userid, _id: null}}).sort('xp', -1).toArray());
+	for (i=0;i<userArr.length;i++) if (userArr[i].userid == userid) return (i+1)+'/'+all;
+}
 
 //new config template insertion
 client.utils.newGuildConfig = async function(guildid){

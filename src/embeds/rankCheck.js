@@ -1,4 +1,4 @@
-module.exports = (message, userLvl) => {
+module.exports = async (message, userLvl) => {
     function reqXP(){
         let sum = 0;
         for (i=0;i<userLvl["lvl"]+1;i++){
@@ -24,6 +24,11 @@ module.exports = (message, userLvl) => {
             name: 'Level progress of '+(message.guild.member(userLvl.userid)?message.guild.member(userLvl.userid).user.tag:`${userLvl.userid} (user left)`)
         },
         fields: [
+            {
+                name: 'Rank',
+                value: await message.client.db.lvl.getRanking(message.guild.id, userLvl["userid"]),
+                inline: true
+            },
             {
                 name: 'Level',
                 value: userLvl["lvl"],
