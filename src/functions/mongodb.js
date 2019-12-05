@@ -65,6 +65,10 @@ client.lvl.newUser = async function(guildid, userid){
 	}
 	return (await client.db('smarkleveling').collection(guildid).insertOne(template)).ops[0];
 }
+//finding and sorting elements in leveling collection
+client.lvl.getLeaderboard = async function(guildid){
+	return await client.db('smarkleveling').collection(guildid).find().sort('xp', -1).toArray();
+}
 //getting user positions and doc count for rank.js command
 client.lvl.getRanking = async function(guildid, userid){
 	let all = await client.db('smarkleveling').collection(guildid).countDocuments();
