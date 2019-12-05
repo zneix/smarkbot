@@ -9,8 +9,9 @@ let client = new mongodb.MongoClient(uri, {
 	socketTimeoutMS: 360000,
 	connectTimeoutMS: 360000
 });
+let lvldb = 'smarkleveling'; //name of database with leveling info
 
-//mongodb utils
+//mongodb general utils
 client.utils = new Object;
 //reconnection
 client.utils.reconnect = async function(){
@@ -45,37 +46,6 @@ client.utils.delete = async function(collectionName, filter){
 	if (!collectionName) return "collection name can't be null";
 	return await client.db().collection(collectionName).deleteMany(filter);
 }
-
-//leveling utils
-client.lvl = {};
-//getting user level info
-client.lvl.findUser = async function(guildid, userid){
-	return await client.db('smarkleveling').collection(guildid).find({userid: userid}).toArray();
-}
-client.lvl.updateUser = async function(guildid, D_OMEGALUL_C){
-	return await client.db('smarkleveling').collection(guildid).findOneAndReplace({userid: D_OMEGALUL_C.userid}, D_OMEGALUL_C);
-}
-//new user level info insertion
-client.lvl.newUser = async function(guildid, userid){
-	(await client.db('smarkleveling').listCollections().toArray()).some(x => x.name === guildid)?null:(await client.db('smarkleveling').createCollection(guildid));
-	let template = {
-		userid: userid,
-		lvl: 0,
-		xp: 0
-	}
-	return (await client.db('smarkleveling').collection(guildid).insertOne(template)).ops[0];
-}
-//finding and sorting elements in leveling collection
-client.lvl.getLeaderboard = async function(guildid){
-	return await client.db('smarkleveling').collection(guildid).find().sort('xp', -1).toArray();
-}
-//getting user positions and doc count for rank.js command
-client.lvl.getRanking = async function(guildid, userid){
-	let all = await client.db('smarkleveling').collection(guildid).countDocuments();
-	let userArr = (await client.db('smarkleveling').collection(guildid).find({}, {projection: {userid: userid, _id: null}}).sort('xp', -1).toArray());
-	for (i=0;i<userArr.length;i++) if (userArr[i].userid == userid) return (i+1)+'/'+all;
-}
-
 //new config template insertion
 client.utils.newGuildConfig = async function(guildid){
 	let template = {
@@ -107,6 +77,36 @@ client.utils.newGuildConfig = async function(guildid){
 		}
 	}
 	return await client.db().collection('guilds').insertOne(template);
+}
+
+//mongodb leveling module utils
+client.lvl = new Object;
+//getting user level info
+client.lvl.findUser = async function(guildid, userid){
+	return await client.db('smarkleveling').collection(guildid).find({userid: userid}).toArray();
+}
+client.lvl.updateUser = async function(guildid, D_OMEGALUL_C){
+	return await client.db('smarkleveling').collection(guildid).findOneAndReplace({userid: D_OMEGALUL_C.userid}, D_OMEGALUL_C);
+}
+//new user level info insertion
+client.lvl.newUser = async function(guildid, userid){
+	(await client.db('smarkleveling').listCollections().toArray()).some(x => x.name === guildid)?null:(await client.db('smarkleveling').createCollection(guildid));
+	let template = {
+		userid: userid,
+		lvl: 0,
+		xp: 0
+	}
+	return (await client.db('smarkleveling').collection(guildid).insertOne(template)).ops[0];
+}
+//finding and sorting elements in leveling collection
+client.lvl.getLeaderboard = async function(guildid){
+	return await client.db('smarkleveling').collection(guildid).find().sort('xp', -1).toArray();
+}
+//getting user positions and doc count for rank.js command
+client.lvl.getRanking = async function(guildid, userid){
+	let all = await client.db('smarkleveling').collection(guildid).countDocuments();
+	let userArr = (await client.db('smarkleveling').collection(guildid).find({}, {projection: {userid: userid, _id: null}}).sort('xp', -1).toArray());
+	for (i=0;i<userArr.length;i++) if (userArr[i].userid == userid) return (i+1)+'/'+all;
 }
 
 //mongodb-related listeners for topology and failed heartbeats information
