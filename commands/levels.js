@@ -38,7 +38,7 @@ exports.run = async (client, message) => {
         await msg.react('🇽');
         const collector = msg.createReactionCollector((reaction, user) => user.id == message.author.id, {time: 120000});
         collector.on('collect', async r => {
-            await r.users.remove(message.author.id);
+            await r.remove(message.author.id);
             switch (r.emoji.name){
                 case '1️⃣':
                     page = 0;
