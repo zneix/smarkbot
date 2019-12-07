@@ -7,31 +7,8 @@ exports.run = async (client, message) => {
     message.command(false, async () => {
         let data = await client.db.lvl.getLeaderboard(message.guild.id);
         let pages = Math.ceil(data.length/10);
-        let page = 1;
-        let embed = {
-            color: Math.floor(Math.random()*256*256*256),
-            timestamp: message.createdAt,
-            footer: {
-                text: `Requested by ${message.author.tag}`,
-                icon_url: message.author.avatarURL
-            },
-            author: {
-                name: `Leaderboard of ${message.guild.name}, Page ${page}/${pages}`
-            },
-            description: buildDesc(page-1)
-        }
-        function actualXP(lvl){
-            let sum = 0;
-            for (i=0;i<lvl;i++) sum += (5 * Math.pow(i, 2) + 50 * i + 100);
-            return sum;
-        }
-        function putMember(index){return `**${index+1}.** __${message.guild.member(data[index]["userid"])?`${message.guild.members.get(data[index]["userid"])} (${message.guild.members.get(data[index]["userid"]).user.tag})`:`User Left (${data[index]["userid"]})`}__\nLvl: **${data[index]["lvl"]}** Exp: **${data[index]["xp"]-actualXP(data[index]["lvl"])}**/**${(actualXP(data[index]["lvl"]+1)-actualXP(data[index]["lvl"]))}** (tot. ${data[index]["xp"]})\n`;}
-        function buildDesc(page){
-            let str = '';
-            for (i=0;i<10;i++) str = str.concat(putMember(page*10+i));
-            return str;
-        }
-        let msg = await message.channel.send({embed:embed});
+        let page = 0;
+        let msg = await message.channel.send({embed:updateEmbed()});
         await msg.react('1️⃣');
         await msg.react('⬅');
         await msg.react('➡');
@@ -54,8 +31,34 @@ exports.run = async (client, message) => {
                 case '🇽':
                     return collector.stop();
             }
-            await msg.edit();
+            await msg.edit({embed:updateEmbed()});
         });
         collector.on('end', () => {msg.clearReactions();});
+        function updateEmbed(){
+            let embed = {
+                color: Math.floor(Math.random()*256*256*256),
+                timestamp: message.createdAt,
+                footer: {
+                    text: `Requested by ${message.author.tag}`,
+                    icon_url: message.author.avatarURL
+                },
+                author: {
+                    name: `Leaderboard of ${message.guild.name}, Page ${page+1}/${pages}`
+                },
+                description: buildDesc(page)
+            }
+            function actualXP(lvl){
+                let sum = 0;
+                for (i=0;i<lvl;i++) sum += (5 * Math.pow(i, 2) + 50 * i + 100);
+                return sum;
+            }
+            function putMember(index){return `**${index+1}.** __${message.guild.member(data[index]["userid"])?`${message.guild.members.get(data[index]["userid"])} (${message.guild.members.get(data[index]["userid"]).user.tag})`:`User Left (${data[index]["userid"]})`}__\nLvl: **${data[index]["lvl"]}** Exp: **${data[index]["xp"]-actualXP(data[index]["lvl"])}**/**${(actualXP(data[index]["lvl"]+1)-actualXP(data[index]["lvl"]))}** (tot. ${data[index]["xp"]})\n`;}
+            function buildDesc(page){
+                let str = '';
+                for (i=0;i<10;i++) str += putMember(page*10+i+1);
+                return str;
+            }
+            return embed;
+        }
     });
 }
