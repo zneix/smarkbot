@@ -21,11 +21,11 @@ exports.run = async (client, message) => {
                     page = 0;
                     break;
                 case '➡':
-                    if (page >= pages) return;
+                    if (page >= pages-1) return;
                     page++;
                     break;
                 case '⬅':
-                    if (page <= 1) return;
+                    if (page <= 0) return;
                     page--;
                     break;
                 case '🇽':
@@ -52,10 +52,10 @@ exports.run = async (client, message) => {
                 for (i=0;i<lvl;i++) sum += (5 * Math.pow(i, 2) + 50 * i + 100);
                 return sum;
             }
-            function putMember(index){return `**${index+1}.** __${message.guild.member(data[index]["userid"])?`${message.guild.members.get(data[index]["userid"])} (${message.guild.members.get(data[index]["userid"]).user.tag})`:`User Left (${data[index]["userid"]})`}__\nLvl: **${data[index]["lvl"]}** Exp: **${data[index]["xp"]-actualXP(data[index]["lvl"])}**/**${(actualXP(data[index]["lvl"]+1)-actualXP(data[index]["lvl"]))}** (tot. ${data[index]["xp"]})\n`;}
+            function putMember(index){return data[index]?`**${index+1}.** __${message.guild.member(data[index]["userid"])?`${message.guild.members.get(data[index]["userid"])} (${message.guild.members.get(data[index]["userid"]).user.tag})`:`User Left (${data[index]["userid"]})`}__\nLvl: **${data[index]["lvl"]}** Exp: **${data[index]["xp"]-actualXP(data[index]["lvl"])}**/**${(actualXP(data[index]["lvl"]+1)-actualXP(data[index]["lvl"]))}** (tot. ${data[index]["xp"]})\n`:'';}
             function buildDesc(page){
                 let str = '';
-                for (i=0;i<10;i++) str += putMember(page*10+i+1);
+                for (let i=0;i<10;i++) str += putMember(page*10+i);
                 return str;
             }
             return embed;
