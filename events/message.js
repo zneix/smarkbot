@@ -9,7 +9,7 @@ module.exports = async (client, message) => {
         //showing prefix on @Mention
         if (message.content.startsWith(client.user)) message.channel.send(`Hey ${message.author}, my prefix in this server is \`${guildprefix}\``);
         let prefix =  function(){return message.content.substr(0, guildprefix.length).toLowerCase();}
-        if (prefix() === guildprefix) {
+        if (prefix() === guildprefix){
             let command = function(){return message.content.split(/ +/g).shift(1).slice(prefix().length).toLowerCase();}
             //args declaration
             message.args = message.content.slice(prefix().length).split(/ +/g);
@@ -72,7 +72,7 @@ module.exports = async (client, message) => {
                 sum += (5 * Math.pow(i, 2) + 50 * i + 100);
             }
             //level up
-            if ((userLvl["xp"]+random) > sum) {
+            if ((userLvl["xp"]+random) > sum){
                 userLvl["lvl"]++;
                 await client.db.lvl.updateUser(message.guild.id, userLvl);
                 //level up annoucment
@@ -92,7 +92,7 @@ module.exports = async (client, message) => {
                         break;
                 }
                 //level up with role reward
-                if (dbconfig.modules.leveling.rewards[userLvl["lvl"]]) {
+                if (dbconfig.modules.leveling.rewards[userLvl["lvl"]]){
                     let rewardRole = message.guild.roles.get(dbconfig.modules.leveling.rewards[`${userLvl["lvl"]}`]);
                     if (message.guild.me.hasPermission('MANAGE_ROLES') && (rewardRole?(rewardRole.calculatedPosition < message.guild.me.highestRole.calculatedPosition):false)) message.member.addRole(rewardRole);
                 }
@@ -102,12 +102,12 @@ module.exports = async (client, message) => {
             await client.db.lvl.updateUser(message.guild.id, userLvl);
         }
     }
-    catch (err) {
+    catch (err){
         // if (typeof err !== "string") err.stack = err;
         console.log(err);
         console.log('\n');
         console.log(err.toString());
-        // var embed = {
+        // let embed = {
         //     color: 0xff5050,
         //     author: {
         //         name:message.channel.guild.name+" — \""+message.channel.name+"\"",

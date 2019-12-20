@@ -10,10 +10,10 @@ exports.run = async (client, message) => {
         const taggedUser = message.mentions.users.first();
         const role = message.guild.roles.get(client.config.roles.member);
         if (!role) return require(`../src/embeds/verificationProblem`)(client, message, `⚠ Role missing! ⚠`, `The role with an ID ${client.config.roles.member} does not exists!\n**Contact admins or zneix immediately!\nTHIS CODE SHOULD NEVER EXECUTE !!!!!!1!!11!111!!!!!!11!!**`);
-        if (!taggedUser) {
+        if (!taggedUser){
             let validUID = message.guild.members.get(message.args[0]);
-            if (!validUID) {
-                if (message.args[0] === `latest`) {
+            if (!validUID){
+                if (message.args[0] === `latest`){
                     if (!client.config.latestMember) return require(`../src/embeds/verificationProblem`)(client, message, `Property does not exist!`, `Use an user ID or @mention.`);
                     try {
                     message.guild.member(latestMember).removeRole(role).then(() => {return require(`../src/embeds/unverified`)(client, message, message.author, latestMember.user)});

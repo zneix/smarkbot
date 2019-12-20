@@ -6,7 +6,7 @@ const schedule = require('node-schedule'); //yet useless
 require('npm-package-to-env').config(); //importing version value from package.json
 require('./extensions/errorHandler'); //handling thrown errors
 
-var Promise = require('bluebird'); //module for error handler and rejections while using fs.writeFile
+let Promise = require('bluebird'); //module for error handler and rejections while using fs.writeFile
 Promise.config({longStackTraces:true}); //enabling long stack trees
 
 //JSON data

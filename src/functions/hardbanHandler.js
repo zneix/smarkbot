@@ -1,4 +1,4 @@
-let perms = require('../json/perms.json'); //import, because getting client var would be pain
+let perms = require('../json/perms.json'); //import, because getting client let would be pain
 exports.unbanned = function(guild, user){
     if (perms["hardban"].includes(user.id)) keep(guild, user);
 }

@@ -1,4 +1,4 @@
-module.exports = async (client, guild, user) => {
+module.exports = (client, guild, user) => {
     if (guild.id !== client.config.guildID) return;
     console.log(`[guildBanRemove] user '${user.tag}' was unbanned from '${guild.name}'`);
 

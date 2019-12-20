@@ -1,5 +1,5 @@
 module.exports = (message, destination, lvl) => {
-    var embed = {
+    let embed = {
         color: 0x8ed938,
         timestamp: new Date(),
         footer: {

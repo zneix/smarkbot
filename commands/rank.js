@@ -22,7 +22,7 @@ exports.run = async (client, message) => {
                 else throw 'Command argument is not a valid member ID or @Mention';
             }
             let userLvl = (await client.db.lvl.findUser(message.guild.id, message.args[0]))[0];
-            if (!userLvl) {
+            if (!userLvl){
                 if (message.guild.member(message.args[0])) userLvl = await client.db.lvl.newUser(message.guild.id, message.args[0]);
                 else throw 'Command argument is not a valid member ID or @Mention';
             }

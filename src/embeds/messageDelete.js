@@ -6,7 +6,7 @@ module.exports = (client, message, channel) => {
         return `${Math.floor(n/86400000)}d ${Math.floor(n/3600000)-(Math.floor(n/86400000)*24)}h`;
     }
     let user = message.author;
-    var embed = {
+    let embed = {
         color: 0x2b2321,
         timestamp: Date.now(),
         footer: {

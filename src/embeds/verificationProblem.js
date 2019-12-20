@@ -1,5 +1,5 @@
 module.exports = (client, message, fname, fvalue) => {
-    var embed = {
+    let embed = {
         color: 0xffed12,
         timestamp: new Date(),
         footer: {

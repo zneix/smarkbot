@@ -11,7 +11,7 @@ module.exports = (client, user, channel, bool) => {
     }
     let date = user.createdAt;
     let formattedDate = leadingZeroes(date.getDate())+'/'+leadingZeroes(date.getMonth()+1)+'/'+date.getFullYear()+', '+leadingZeroes(date.getHours())+':'+leadingZeroes(date.getMinutes())+':'+leadingZeroes(date.getSeconds());
-    var embed = {
+    let embed = {
         color: (bool?0xff5b42:0x5bff42), // Ban || Unban
         timestamp: Date.now(),
         thumbnail: user.avatarURL,
