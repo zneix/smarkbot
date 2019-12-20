@@ -13,7 +13,7 @@ module.exports = async (message, userLvl) => {
         }
         return sum;
     }
-    var embed = {
+    let embed = {
         color: 0xe7f135,
         timestamp: new Date(),
         footer: {

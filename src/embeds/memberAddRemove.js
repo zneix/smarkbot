@@ -11,7 +11,7 @@ module.exports = (client, member, channel, bool) => {
     }
     let date = member.user.createdAt;
     let formattedDate = leadingZeroes(date.getDate())+'/'+leadingZeroes(date.getMonth()+1)+'/'+date.getFullYear()+', '+leadingZeroes(date.getHours())+':'+leadingZeroes(date.getMinutes())+':'+leadingZeroes(date.getSeconds());
-    var embed = {
+    let embed = {
         color: (bool?0x00ff1f:0xff001f), // Join || Leave
         timestamp: Date.now(),
         thumbnail: member.user.avatarURL,

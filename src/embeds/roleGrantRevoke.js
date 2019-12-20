@@ -1,5 +1,5 @@
 module.exports = (client, message, role, added) => {
-    var embed = {
+    let embed = {
         color: (added?0x00ff00:0xff0000),
         timestamp: message.createdAt,
         footer: {

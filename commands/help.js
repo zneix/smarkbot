@@ -7,10 +7,10 @@ exports.run = (client, message) => {
     message.command(false, async () => {
         let guildprefix = (await client.db.utils.find('guilds', {guildid: message.guild.id}))[0].customprefix;guildprefix = guildprefix===null?client.config.prefix:guildprefix;
         if (message.args.length) cmd = client.commands.get(message.args[0].toLowerCase());
-        if (!message.args.length || !cmd) {
+        if (!message.args.length || !cmd){
             let commandList = "";
             client.commands.forEach((object, key, map) => commandList = commandList.concat(`\`${key}\`\n`));
-            var cmd = client.commands.get("help");
+            let cmd = client.commands.get("help");
             embed = { //send general help with command list
                 color: parseInt("0x99ff66"),
                 author: {
