@@ -1,5 +1,5 @@
 exports.name = `{PREFIX}${__filename.split(/[\\/]/).pop().slice(0,-3)}`;
-exports.description = 'Gives you root perms on a server if it has configured role management.';
+exports.description = 'Assign/Revoke roles from you if used correctly. Run this command without arguments to get list of available roles to assign.';
 exports.usage = `{PREFIX}${__filename.split(/[\\/]/).pop().slice(0,-3)}`;
 exports.perms = 'user';
 
